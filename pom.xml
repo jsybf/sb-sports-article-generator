@@ -15,6 +15,7 @@
         <kotlin.version>2.1.10</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
         <junit.version>4.13.1</junit.version>
+        <ktor.version>3.1.2</ktor.version>
     </properties>
 
     <dependencies>
@@ -34,6 +35,22 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.19.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-core</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.ktor/ktor-client-cio-jvm -->
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-cio-jvm</artifactId>
+            <version>${ktor.version}</version>
         </dependency>
     </dependencies>
 
