@@ -42,15 +42,9 @@
             <version>1.19.1</version>
         </dependency>
         <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-core</artifactId>
-            <version>${ktor.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.ktor/ktor-client-cio-jvm -->
-        <dependency>
-            <groupId>io.ktor</groupId>
-            <artifactId>ktor-client-cio-jvm</artifactId>
-            <version>${ktor.version}</version>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.51.0</version>
         </dependency>
     </dependencies>
 
