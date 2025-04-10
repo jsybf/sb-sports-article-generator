@@ -1,3 +1,8 @@
 target
 .idea/
+<<<<<<< HEAD
 docs/
+=======
+docs
+test-data/
+>>>>>>> impl/request
