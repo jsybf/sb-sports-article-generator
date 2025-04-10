@@ -30,7 +30,7 @@ class HockeyScraper(
         .let { HockeyPage.PlayerPage(it) }
 
     fun scrapeAllUpcomingMatchList(): List<HockeyMatchPages> {
-        return this.requestUpcommingMatchSummaryUrlList().slice(0..1)
+        return this.requestUpcommingMatchSummaryUrlList().slice(0..3)
             .map { matchSummaryUrl: String ->
                 val matchSumamary: HockeyPage.SummaryPage = requestMatchSummaryDoc(matchSummaryUrl)
 
