@@ -6,7 +6,7 @@ import com.anthropic.models.messages.Model
 
 
 class ClaudeSportArticleWriter(
-    private val apiKey: String
+    apiKey: String
 ) {
 
     private val client = AnthropicOkHttpClient.builder()
@@ -38,17 +38,12 @@ class ClaudeSportArticleWriter(
             
     """.trimIndent()
 
-    fun generateArticle(attachment: String): String {
-        val query = buildString {
-            append(prompt)
-            append("\n")
-            append(attachment)
-            append("\n")
-        }
+    fun generateArticle(attachment: String, prompt: String = this.prompt): String {
         val param: MessageCreateParams = MessageCreateParams.builder()
             .maxTokens(4096L)
-            .addUserMessage(query)
-            .model(Model.CLAUDE_3_5_HAIKU_LATEST)
+            .system(prompt)
+            .addUserMessage(attachment)
+            .model(Model.CLAUDE_3_7_SONNET_LATEST)
             .build()
 
         println("[INFO] request claude to generate article")
@@ -58,7 +53,7 @@ class ClaudeSportArticleWriter(
                 chunk.contentBlockDelta().stream()
                     .flatMap { deltaEvent -> deltaEvent.delta().text().stream() }
                     .forEach { textDelta ->
-                        println(textDelta.text())
+                        print(textDelta.text())
                         respBuilder.append(textDelta.text())
                     }
             }
