@@ -1,21 +1,17 @@
 package io.gitp.llmarticlewriter.service
 
-import io.gitp.llmarticlewriter.database.HockeyLLMArticleTbl
-import io.gitp.llmarticlewriter.database.HockeyMatchSummaryPageTbl
-import io.gitp.llmarticlewriter.database.HockeyMatchTbl
-import io.gitp.llmarticlewriter.database.HockeyPlayerPageTbl
+import io.gitp.llmarticlewriter.database.*
 import io.gitp.llmarticlewriter.database.repo.HockeyRepo
 import io.gitp.llmarticlewriter.llmwriter.ClaudeSportArticleWriter
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 private val db = Database.connect(
     url = "jdbc:sqlite:./test-data/demo-sqlite-1.db",
     driver = "org.sqlite.JDBC",
-    databaseConfig = DatabaseConfig { sqlLogger = StdOutSqlLogger }
+    databaseConfig = DatabaseConfig { sqlLogger = ExposedLogger }
 )
 
 private val writer = System.getenv("CLAUDE_API_KEY")
@@ -43,6 +39,6 @@ fun main() {
             HockeyLLMArticleTbl
         )
     }
-    // scrapDemo()
-    generateArticlesDemo()
+    scrapDemo()
+    // generateArticlesDemo()
 }

@@ -43,7 +43,7 @@ class ClaudeSportArticleWriter(
             .maxTokens(4096L)
             .system(prompt)
             .addUserMessage(attachment)
-            .model(Model.CLAUDE_3_7_SONNET_LATEST)
+            .model(Model.CLAUDE_3_5_SONNET_LATEST)
             .build()
 
         println("[INFO] request claude to generate article")
