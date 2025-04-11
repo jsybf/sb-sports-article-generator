@@ -18,6 +18,7 @@ class HockeyPageTest {
         val sample = HockeyPage.SummaryPage(matchSummaryPageSample)
         assertEquals(Pair("일본 여", "노르웨이 여"), sample.parseTeam())
     }
+
     @Test
     fun `parse match start datetime test`() {
         val sample = HockeyPage.SummaryPage(matchSummaryPageSample)

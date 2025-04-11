@@ -1,5 +1,6 @@
 package examples
 
+import ClaudeSportArticleWriter
 import db.HockeyLLMArticleTbl
 import db.HockeyMatchSummaryPageTbl
 import db.HockeyMatchTbl
@@ -14,7 +15,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import scrape.PlaywrightBrowser
 import scrape.hockey.HockeyPage
 import scrape.hockey.HockeyScraper
-import writer.ClaudeSportArticleWriter
 
 fun main() {
     val db = Database.connect(

@@ -2,7 +2,6 @@ package scrape.hockey
 
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import db.HockeyMatch
 import scrape.LLMQueryAttachment
 import scrape.SportsWebPage
 import java.time.LocalDateTime

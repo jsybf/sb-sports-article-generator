@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.gitp.sports-article-writer</groupId>
+        <artifactId>sports-article-writer</artifactId>
+        <version>0.0.1</version>
+    </parent>
+
+    <artifactId>service</artifactId>
+    <packaging>jar</packaging>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>io.gitp.sports-article-writer</groupId>
+            <artifactId>scraper</artifactId>
+            <version>${sports-article-writer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.gitp.sports-article-writer</groupId>
+            <artifactId>llm-writer</artifactId>
+            <version>${sports-article-writer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.gitp.sports-article-writer</groupId>
+            <artifactId>repository</artifactId>
+            <version>${sports-article-writer.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-core</artifactId>
+            <version>${exposed.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-jdbc</artifactId>
+            <version>${exposed.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-dao</artifactId>
+            <version>${exposed.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-java-time</artifactId>
+            <version>${exposed.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.49.1.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

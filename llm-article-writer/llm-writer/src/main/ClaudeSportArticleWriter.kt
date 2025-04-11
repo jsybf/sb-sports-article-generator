@@ -1,9 +1,6 @@
-package writer
-
 import com.anthropic.client.okhttp.AnthropicOkHttpClient
 import com.anthropic.models.messages.MessageCreateParams
 import com.anthropic.models.messages.Model
-import scrape.LLMQueryAttachment
 
 
 class ClaudeSportArticleWriter(
@@ -68,7 +65,7 @@ class ClaudeSportArticleWriter(
         return respBuilder.toString()
     }
 
-    fun generateArticle(attachment: LLMQueryAttachment): String = generateArticle(attachment.toLLMQueryAttachment())
+    // fun generateArticle(attachment: LLMQueryAttachment): String = generateArticle(attachment.toLLMQueryAttachment())
 
     fun close() {
         this.client.close()
