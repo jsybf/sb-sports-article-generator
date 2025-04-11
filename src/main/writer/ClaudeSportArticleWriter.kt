@@ -26,13 +26,15 @@ class ClaudeSportArticleWriter(
             
             
             예측/분석을 할때 아래와 같은 사항을 지켜줘
+            - 
+            - 이모지들을 너무 많진 않지만 살짝 달아줘 글 초반에 
             - 구체적인 수치를 바탕으로 근거있는 주장하기
             - 단순 수치 나열이 아닌 너만의 의견을 담기
             - 진지하지만 흡입력있는 글을 써.
             - 40대 말투로. 반말을 쓰지 않음.
             - 마크다운형식이 아닌 그냥 문장형태로.
             - 무뚜뚝한 말투로. 친근한척 하지마.
-            - 가독성 좋게 문단을 나눠줘.
+            - 가독성 좋게 문단을 나눠줘.(3~4문단 내외)
             - 글은 1500내외로 맞춰줘.
             
     """.trimIndent()
@@ -47,7 +49,7 @@ class ClaudeSportArticleWriter(
         val param: MessageCreateParams = MessageCreateParams.builder()
             .maxTokens(4096L)
             .addUserMessage(query)
-            .model(Model.CLAUDE_3_7_SONNET_20250219)
+            .model(Model.CLAUDE_3_5_HAIKU_LATEST)
             .build()
 
         println("[INFO] request claude to generate article")

@@ -29,12 +29,12 @@ class HockeyScraper(
         .doAndGetDoc { navigate(url) }
         .let { HockeyPage.PlayerPage(it) }
 
-    fun scrapeAllUpcomingMatchList(): List<HockeyMatchPages> {
-        return this.requestUpcommingMatchSummaryUrlList().slice(0..3)
+    fun scrapeAllUpcomingMatchList(): List<HockeyPage.MatchPageSet> {
+        return this.requestUpcommingMatchSummaryUrlList().slice(0..1)
             .map { matchSummaryUrl: String ->
                 val matchSumamary: HockeyPage.SummaryPage = requestMatchSummaryDoc(matchSummaryUrl)
 
-                HockeyMatchPages(
+                HockeyPage.MatchPageSet(
                     matchSummaryPage = matchSumamary,
                     absencePlayerPageList = matchSumamary.parseAbsencePlayerUrlList().map { url -> this.requestPlayerDoc(url) }
                 )

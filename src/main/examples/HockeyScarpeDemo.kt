@@ -1,7 +1,7 @@
 package examples
 
 import scrape.PlaywrightBrowser
-import scrape.hockey.HockeyMatchPages
+import scrape.hockey.HockeyPage
 import scrape.hockey.HockeyScraper
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
@@ -12,12 +12,12 @@ import kotlin.io.path.writeText
  * then save response html file
  */
 fun main() {
-    val upcomingHockeyMatchPageList: List<HockeyMatchPages> = PlaywrightBrowser().use { browser ->
+    val upcommingMatchPageSetList: List<HockeyPage.MatchPageSet> = PlaywrightBrowser().use { browser ->
         HockeyScraper(browser).scrapeAllUpcomingMatchList()
     }
 
     val basePath = Path.of("test-data/scraped-html").toAbsolutePath()
-    upcomingHockeyMatchPageList.forEachIndexed { idx, pages ->
+    upcommingMatchPageSetList.forEachIndexed { idx, pages ->
         val saveDir = basePath.resolve("$idx").also { it.createDirectories() }
         saveDir.resolve("match.html").writeText(pages.matchSummaryPage.doc.html())
         pages.absencePlayerPageList.forEachIndexed { playerPageIdx, playerPage ->
