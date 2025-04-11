@@ -1,4 +1,4 @@
-package db.dto
+package io.gitp.llmarticlewriter.database.dto
 
 import scrape.hockey.HockeyPage
 

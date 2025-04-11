@@ -1,7 +1,7 @@
-package db.repo
+package io.gitp.llmarticlewriter.database.repo
 
-import db.*
-import db.dto.HockeyDto
+import io.gitp.llmarticlewriter.database.*
+import io.gitp.llmarticlewriter.database.dto.HockeyDto
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
 import scrape.hockey.HockeyPage

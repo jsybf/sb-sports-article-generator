@@ -1,3 +1,5 @@
+package io.gitp.llmarticlewriter.llmwriter
+
 import com.anthropic.client.okhttp.AnthropicOkHttpClient
 import com.anthropic.models.messages.MessageCreateParams
 import com.anthropic.models.messages.Model

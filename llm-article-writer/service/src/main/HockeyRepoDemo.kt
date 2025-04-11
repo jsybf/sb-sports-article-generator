@@ -1,12 +1,12 @@
-package examples
+package io.gitp.llmarticlewriter.service
 
-import ClaudeSportArticleWriter
-import db.HockeyLLMArticleTbl
-import db.HockeyMatchSummaryPageTbl
-import db.HockeyMatchTbl
-import db.HockeyPlayerPageTbl
-import db.dto.HockeyDto
-import db.repo.HockeyRepo
+import io.gitp.llmarticlewriter.database.HockeyLLMArticleTbl
+import io.gitp.llmarticlewriter.database.HockeyMatchSummaryPageTbl
+import io.gitp.llmarticlewriter.database.HockeyMatchTbl
+import io.gitp.llmarticlewriter.database.HockeyPlayerPageTbl
+import io.gitp.llmarticlewriter.database.dto.HockeyDto
+import io.gitp.llmarticlewriter.database.repo.HockeyRepo
+import io.gitp.llmarticlewriter.llmwriter.ClaudeSportArticleWriter
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils

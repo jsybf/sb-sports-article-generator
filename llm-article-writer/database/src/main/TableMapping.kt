@@ -1,4 +1,4 @@
-package db
+package io.gitp.llmarticlewriter.database
 
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass

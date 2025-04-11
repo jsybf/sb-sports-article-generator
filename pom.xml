@@ -13,7 +13,7 @@
 
     <modules>
         <module>llm-article-writer/llm-writer</module>
-        <module>llm-article-writer/repository</module>
+        <module>llm-article-writer/database</module>
         <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/service</module>
     </modules>

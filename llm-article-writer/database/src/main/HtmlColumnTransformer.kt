@@ -1,4 +1,4 @@
-package db
+package io.gitp.llmarticlewriter.database
 
 import org.jetbrains.exposed.sql.ColumnTransformer
 import org.jsoup.Jsoup

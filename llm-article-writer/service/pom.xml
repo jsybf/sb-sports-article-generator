@@ -27,7 +27,7 @@
         </dependency>
         <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
-            <artifactId>repository</artifactId>
+            <artifactId>database</artifactId>
             <version>${sports-article-writer.version}</version>
         </dependency>
         <dependency>
