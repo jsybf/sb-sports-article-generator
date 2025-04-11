@@ -39,7 +39,7 @@ class ClaudeSportArticleWriter(
             
     """.trimIndent()
 
-    fun generateArticle(attachment: String): Unit {
+    fun generateArticle(attachment: String): String {
         val query = buildString {
             append(prompt)
             append("\n")
@@ -53,18 +53,22 @@ class ClaudeSportArticleWriter(
             .build()
 
         println("[INFO] request claude to generate article")
+        val respBuilder = StringBuilder()
         client.async().messages().createStreaming(param)
             .subscribe { chunk ->
                 chunk.contentBlockDelta().stream()
                     .flatMap { deltaEvent -> deltaEvent.delta().text().stream() }
-                    .forEach { textDelta -> System.out.print(textDelta.text()) }
+                    .forEach { textDelta ->
+                        println(textDelta.text())
+                        respBuilder.append(textDelta.text())
+                    }
             }
             .onCompleteFuture()
             .join()
-
+        return respBuilder.toString()
     }
 
-    fun generateArticle(attachment: LLMQueryAttachment): Unit = generateArticle(attachment.toLLMQueryAttachment())
+    fun generateArticle(attachment: LLMQueryAttachment): String = generateArticle(attachment.toLLMQueryAttachment())
 
     fun close() {
         this.client.close()

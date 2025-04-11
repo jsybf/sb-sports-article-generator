@@ -2,6 +2,7 @@ package scrape.hockey
 
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import db.HockeyMatch
 import scrape.LLMQueryAttachment
 import scrape.SportsWebPage
 import java.time.LocalDateTime
@@ -34,7 +35,7 @@ object HockeyPage {
         /**
          * 경기 시작 날짜를 html에서 파싱
          */
-        fun parseMatchDateTime(): LocalDateTime {
+        fun parseStartDateTime(): LocalDateTime {
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
 
             val matchDateTimeStr = doc
@@ -78,6 +79,7 @@ object HockeyPage {
             }
         }
     }
+
 }
 
 private fun Element.srinkHtml(): Element {

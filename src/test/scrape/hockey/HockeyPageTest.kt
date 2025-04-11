@@ -21,6 +21,6 @@ class HockeyPageTest {
     @Test
     fun `parse match start datetime test`() {
         val sample = HockeyPage.SummaryPage(matchSummaryPageSample)
-        assertEquals(LocalDateTime.of(2025, 4, 10, 18, 0, 0), sample.parseMatchDateTime())
+        assertEquals(LocalDateTime.of(2025, 4, 10, 18, 0, 0), sample.parseStartDateTime())
     }
 }
