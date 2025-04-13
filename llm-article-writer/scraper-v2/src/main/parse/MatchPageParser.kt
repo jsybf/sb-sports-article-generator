@@ -3,6 +3,38 @@ package parse
 import kotlinx.serialization.json.*
 import model.HockeyPage
 import org.jsoup.nodes.Document
+import java.time.LocalDateTime
+
+/**
+ * @return (homeTeam, awayTeam)
+ */
+internal fun HockeyPage.MatchPage.parseTeam(): Pair<String, String> {
+    val homeTeam = doc
+        .select("#detail > div.duelParticipant > div.duelParticipant__home > div.participant__participantNameWrapper > div.participant__participantName.participant__overflow > a")
+        .first()!!
+        .text()
+
+    val awayTeam = doc
+        .select("#detail > div.duelParticipant > div.duelParticipant__away > div.participant__participantNameWrapper > div.participant__participantName.participant__overflow > a")
+        .first()!!
+        .text()
+
+    return Pair(homeTeam, awayTeam)
+}
+
+/**
+ * 경기 시작 날짜를 html에서 파싱
+ */
+internal fun HockeyPage.MatchPage.parseStartDateTime(): LocalDateTime {
+    val formatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+
+    val matchDateTimeStr = doc
+        .select("#detail > div.duelParticipant > div.duelParticipant__startTime > div")
+        .first()!!
+        .text()
+
+    return java.time.LocalDateTime.parse(matchDateTimeStr, formatter)
+}
 
 // llm 이 작성...
 internal fun HockeyPage.MatchPage.parse(): JsonObject = buildJsonObject {

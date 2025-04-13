@@ -3,16 +3,11 @@ package scrape
 import PlaywrightBrowser
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import model.HockeyPage
+import model.League
 
 internal class HockeyScraper(
     private val browser: PlaywrightBrowser
 ) {
-    enum class League(
-        val url: String
-    ) {
-        NHL("https://www.flashscore.co.kr/hockey/usa/nhl/fixtures/"),
-        KHL("https://www.flashscore.co.kr/hockey/russia/khl/fixtures/")
-    }
 
 
     fun requestUpcommingMatchListPage(league: League): HockeyPage.UpcommingMatcListhPage = browser
@@ -55,7 +50,7 @@ internal class HockeyScraper(
 
 
 // example
-fun main() {
+private fun main() {
     PlaywrightBrowser().use { browser ->
         val scraper = HockeyScraper(browser)
         scraper.requestOverUnderBetPage("https://www.flashscore.co.kr/match/hockey/GYgPihBG/#/match-summary")
