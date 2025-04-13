@@ -2,6 +2,7 @@ package scrape.hockey
 
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import scrape.PlaywrightBrowser
+import scrape.hockey.parse.parseAbsencePlayerUrlList
 
 class HockeyScraper(
     private val browser: PlaywrightBrowser
