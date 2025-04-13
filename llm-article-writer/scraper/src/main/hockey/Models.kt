@@ -81,7 +81,7 @@ object HockeyPage {
 
 }
 
-private fun Element.srinkHtml(): Element {
+fun Element.srinkHtml(): Element {
     this.select("*").forEach { node ->
         if (node.hasAttr("class")) node.removeAttr("class")
         if (node.hasAttr("style")) node.removeAttr("style")

@@ -12,6 +12,7 @@
     <name>sports-article-writer</name>
 
     <modules>
+        <module>llm-article-writer/llm-sandbox</module>
         <module>llm-article-writer/llm-writer</module>
         <module>llm-article-writer/database</module>
         <module>llm-article-writer/scraper</module>
