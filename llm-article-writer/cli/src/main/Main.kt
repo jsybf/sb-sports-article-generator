@@ -1,20 +1,22 @@
 package io.gitp.llmarticlewriter.cli
 
+import com.anthropic.client.okhttp.AnthropicOkHttpClient
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
+import io.gitp.llmarticlewriter.cli.service.LLMArticleGenerateService
 import io.gitp.llmarticlewriter.cli.service.ScrapeService
-import io.gitp.llmarticlewriter.database.HockeyScrapedPageDto
 import io.gitp.llmarticlewriter.database.MatchInfoDto
+import io.gitp.llmarticlewriter.database.ScrapedPageDto
 import io.gitp.llmarticlewriter.database.SportsRepository
 import io.gitp.llmarticlewriter.database.getSqliteConn
 import io.gitp.llmarticlewriter.scraper.model.League
 import io.gitp.llmarticlewriter.scraper.model.MatchInfo
 
-fun MatchInfo.toHockeyMatchDto() = MatchInfoDto(
+fun MatchInfo.toMatchInfoDto() = MatchInfoDto(
     id = null,
     homeTeam = homeTeam,
     awayTeam = awayTeam,
@@ -23,7 +25,7 @@ fun MatchInfo.toHockeyMatchDto() = MatchInfoDto(
     matchPageUrl = matchPageUrl
 )
 
-fun MatchInfo.toHockeyScrapedPageDto() = HockeyScrapedPageDto(
+fun MatchInfo.toScrapedPageDto() = ScrapedPageDto(
     id = null,
     summary = matchSummary.toString(),
     oneXTwoBet = oneXTwoBet.toString(),
@@ -51,15 +53,18 @@ private class BasketBallScrapeCmd : CliktCommand(name = "basketball") {
 }
 
 private class ArticleGenerateCmdRoot : CliktCommand(name = "generate") {
-    override fun run() = Unit
-}
-
-private class HockeyArticleGenerateCmd : CliktCommand(name = "hockey") {
-    val league: League.Hockey by option("--league", "-l").enum<League.Hockey>().required()
     override fun run() {
-        echo("selected league is ${league}")
+        val claudeApiKey = System.getenv("CLAUDE_API_KEY") ?: throw Exception("env CLAUDE_API_KEY is missing")
+
+        val articleGenerateService = LLMArticleGenerateService(
+            AnthropicOkHttpClient.builder().apiKey(claudeApiKey).build(),
+            SportsRepository(getSqliteConn("jdbc:sqlite:./test-data/dev-sqlite.db"))
+        )
+
+        articleGenerateService.generateAndInsertArticle()
     }
 }
+
 
 private class ExportCmd : CliktCommand(name = "export") {
     override fun run() = Unit
@@ -72,6 +77,6 @@ private class RootCmd : CliktCommand("saw") {
 fun main(args: Array<String>) = RootCmd()
     .subcommands(
         ScrapeCmdRoot().subcommands(HockeyScrapeCmd(), BasketBallScrapeCmd()),
-        ArticleGenerateCmdRoot().subcommands(HockeyArticleGenerateCmd()),
+        ArticleGenerateCmdRoot(),
         ExportCmd()
     ).main(args)

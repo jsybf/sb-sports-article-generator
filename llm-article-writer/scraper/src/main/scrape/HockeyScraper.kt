@@ -14,7 +14,7 @@ internal class HockeyScraper(
 
 
     fun requestUpcommingMatchListPage(league: League.Hockey): CommonMatchUrlListPage = browser
-        .also { println("[INFO] requesting hockey-match-list (https://www.flashscore.co.kr/hockey/)") }
+        .also { println("[INFO] requesting hockey-match-list (${league.matchListPageUrl})") }
         .doAndGetDoc {
             navigate(league.matchListPageUrl)
         }

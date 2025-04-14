@@ -1,7 +1,7 @@
 package io.gitp.llmarticlewriter.cli.service
 
-import io.gitp.llmarticlewriter.cli.toHockeyMatchDto
-import io.gitp.llmarticlewriter.cli.toHockeyScrapedPageDto
+import io.gitp.llmarticlewriter.cli.toMatchInfoDto
+import io.gitp.llmarticlewriter.cli.toScrapedPageDto
 import io.gitp.llmarticlewriter.database.SportsRepository
 import io.gitp.llmarticlewriter.scraper.PlaywrightBrowser
 import io.gitp.llmarticlewriter.scraper.model.League
@@ -21,8 +21,8 @@ internal class ScrapeService(
 
         matchList
             .forEach { matchInfo ->
-                val matchId = repo.insertHockeyMatch(matchInfo.toHockeyMatchDto())
-                repo.insertHockeyScrapedPage(matchId, matchInfo.toHockeyScrapedPageDto())
+                val matchId = repo.insertMatch(matchInfo.toMatchInfoDto())
+                repo.insertScrapedPage(matchId, matchInfo.toScrapedPageDto())
             }
     }
 }

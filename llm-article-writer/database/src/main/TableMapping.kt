@@ -28,8 +28,8 @@ object ArticleTbl : IntIdTable("article") {
     val hockeyMatchId = reference("sports_match_id", SportsMatchTable)
     val updatedAt = datetime("updated_at")
     val article = text("article")
-    val inputTokens = integer("inputTokens")
-    val outputTokens = integer("outputTokens")
+    val inputTokens = long("inputTokens")
+    val outputTokens = long("outputTokens")
 }
 
 class SportsMatchEntity(id: EntityID<Int>) : IntEntity(id) {

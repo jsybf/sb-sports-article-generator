@@ -7,6 +7,6 @@ data class CommonMatchUrlListPage(
 ) {
     fun extractMatchUrls(): List<String> =
         this.doc
-            .select(".event__match--withRowLink a")
+            .select(".event__match--withRowLink a.eventRowLink")
             .map { aElement -> aElement.attribute("href")!!.value }
 }
