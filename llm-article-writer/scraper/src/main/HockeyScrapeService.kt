@@ -25,6 +25,7 @@ public class HockeyScrapeService(
                 homeTeam = homeTeam,
                 matchAt = mapPage.parseStartDateTime(),
                 league = league,
+                matchPageUrl = url,
                 matchSummary = mapPage.parse(),
                 oneXTwoBet = oneXTwoBetPage.parseOdds(),
                 overUnderBet = overUnderBetPage.parseOverUnderOdds()
