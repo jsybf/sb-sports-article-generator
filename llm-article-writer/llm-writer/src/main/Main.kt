@@ -28,18 +28,18 @@ private fun HockeyMatchInfo.toLLMQuery(): String {
     """.trimIndent()
 }
 
-private fun main() {
-    val baseDir = Path.of("./test-data/output-examples").toAbsolutePath().normalize().also { it.createDirectories() }
-    val matchList: List<HockeyMatchInfo> = PlaywrightBrowser().use { browser -> HockeyScrapeService(browser).scrapeUpcommingMatch(League.NHL) }
-    val claudeClient = AnthropicOkHttpClient.builder().apiKey(System.getenv("CLAUDE_API_KEY")!!).build()
-
-    matchList.forEach { matchInfo ->
-        val resp = claudeClient.requestStreaming {
-            model(Model.CLAUDE_3_7_SONNET_LATEST)
-            maxTokens(2048L)
-            system(systemPrompt)
-            addUserMessage(matchInfo.toLLMQuery())
-        }
-        baseDir.resolve("${matchInfo.homeTeam}_${matchInfo.awayTeam}_${matchInfo.matchAt}.txt").writeText(resp.message)
-    }
-}
+// private fun main() {
+//     val baseDir = Path.of("./test-data/output-examples").toAbsolutePath().normalize().also { it.createDirectories() }
+//     val matchList: List<HockeyMatchInfo> = PlaywrightBrowser().use { browser -> HockeyScrapeService(browser).scrapeUpcommingMatch(League.NHL) }
+//     val claudeClient = AnthropicOkHttpClient.builder().apiKey(System.getenv("CLAUDE_API_KEY")!!).build()
+//
+//     matchList.forEach { matchInfo ->
+//         val resp = claudeClient.requestStreaming {
+//             model(Model.CLAUDE_3_7_SONNET_LATEST)
+//             maxTokens(2048L)
+//             system(systemPrompt)
+//             addUserMessage(matchInfo.toLLMQuery())
+//         }
+//         baseDir.resolve("${matchInfo.homeTeam}_${matchInfo.awayTeam}_${matchInfo.matchAt}.txt").writeText(resp.message)
+//     }
+// }
