@@ -74,6 +74,7 @@ class HockeyRepo(
             homeTeam = hockeyMatchDto.homeTeam
             awayTeam = hockeyMatchDto.awayTeam
             updatedAt = LocalDateTime.now()
+            league = hockeyMatchDto.league
             matchPageUrl = hockeyMatchDto.matchPageUrl
         }.id.value
     }

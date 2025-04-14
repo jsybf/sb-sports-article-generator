@@ -7,8 +7,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.javatime.datetime
 
-// 테이블 정의
-object HockeyMatchTbl : IntIdTable() {
+object HockeyMatchTbl : IntIdTable("hockey_match") {
     val startAt = datetime("start_at")
     val homeTeam = text("home_team")
     val awayTeam = text("away_team")
@@ -17,7 +16,7 @@ object HockeyMatchTbl : IntIdTable() {
     val matchPageUrl = text("match_page_url")
 }
 
-object HockeyScrapedTbl : IntIdTable() {
+object HockeyScrapedTbl : IntIdTable("hockey_scraped") {
     val hockeyMatchId = reference("hockey_match_id", HockeyMatchTbl)
     val updatedAt = datetime("updated_at")
     val summary = text("summary")
@@ -25,7 +24,7 @@ object HockeyScrapedTbl : IntIdTable() {
     val overUnderBet = text("over_under_bet")
 }
 
-object HockeyArticleTbl : IntIdTable() {
+object HockeyArticleTbl : IntIdTable("hockey_article") {
     val hockeyMatchId = reference("hockey_match_id", HockeyMatchTbl)
     val updatedAt = datetime("updated_at")
     val article = text("article")
@@ -33,7 +32,6 @@ object HockeyArticleTbl : IntIdTable() {
     val outputTokens = integer("outputTokens")
 }
 
-// DAO 클래스 정의
 class HockeyMatchEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<HockeyMatchEntity>(HockeyMatchTbl)
 
@@ -44,7 +42,6 @@ class HockeyMatchEntity(id: EntityID<Int>) : IntEntity(id) {
     var matchPageUrl by HockeyMatchTbl.matchPageUrl
     var league by HockeyMatchTbl.league
 
-    // 관계 정의
     val scraped by HockeyScrapedEntity backReferencedOn HockeyScrapedTbl.hockeyMatchId
     val article by HockeyArticleEntity optionalBackReferencedOn HockeyArticleTbl.hockeyMatchId
 }
