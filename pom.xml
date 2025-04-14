@@ -12,12 +12,8 @@
     <name>sports-article-writer</name>
 
     <modules>
-        <module>llm-article-writer/llm-sandbox</module>
-        <module>llm-article-writer/llm-writer</module>
-        <module>llm-article-writer/database</module>
-        <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/scraper-v2</module>
-        <module>llm-article-writer/service</module>
+        <module>llm-article-writer/llm-writer-v2</module>
     </modules>
 
     <properties>
@@ -63,9 +59,7 @@
                 <directory>src/test/resources</directory>
             </testResource>
         </testResources>
-
         <plugins>
-
             <plugin>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <groupId>org.jetbrains.kotlin</groupId>

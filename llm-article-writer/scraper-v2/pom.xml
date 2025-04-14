@@ -8,6 +8,7 @@
         <groupId>io.gitp.sports-article-writer</groupId>
         <artifactId>sports-article-writer</artifactId>
         <version>0.0.1</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>scraper-v2</artifactId>
