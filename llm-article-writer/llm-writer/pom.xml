@@ -11,7 +11,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>llm-writer-v2</artifactId>
+    <artifactId>llm-writer</artifactId>
     <packaging>jar</packaging>
 
 
@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
-            <artifactId>scraper-v2</artifactId>
+            <artifactId>scraper</artifactId>
             <version>0.0.1</version>
         </dependency>
     </dependencies>

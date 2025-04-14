@@ -11,7 +11,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>scraper-v2</artifactId>
+    <artifactId>scraper</artifactId>
     <packaging>jar</packaging>
 
     <properties>

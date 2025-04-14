@@ -12,8 +12,8 @@
     <name>sports-article-writer</name>
 
     <modules>
-        <module>llm-article-writer/scraper-v2</module>
-        <module>llm-article-writer/llm-writer-v2</module>
+        <module>llm-article-writer/scraper</module>
+        <module>llm-article-writer/llm-writer</module>
     </modules>
 
     <properties>
