@@ -1,4 +1,4 @@
-package model.basketball
+package io.gitp.llmarticlewriter.scraper.model.pages.basketball
 
 import kotlinx.serialization.json.*
 import org.jsoup.nodes.Document

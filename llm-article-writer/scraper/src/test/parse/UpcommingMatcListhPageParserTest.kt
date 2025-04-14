@@ -1,6 +1,6 @@
 package parse
 
-import model.HockeyPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonMatchUrlListPage
 import org.jsoup.Jsoup
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -13,7 +13,7 @@ class UpcommingMatcListhPageParserTest {
     @Test
     fun `parse match page url link from match list page`() {
         assertEquals(
-            HockeyPage.UpcommingMatcListhPage(sampleHtml).parseMatchUrl(),
+            CommonMatchUrlListPage(sampleHtml).extractMatchUrls(),
             listOf(
                 "https://www.flashscore.co.kr/match/hockey/2aZjIqZI/#/match-summary",
                 "https://www.flashscore.co.kr/match/hockey/GGbd7heD/#/match-summary",

@@ -1,4 +1,4 @@
-package model.common
+package io.gitp.llmarticlewriter.scraper.model.pages.common
 
 import kotlinx.serialization.json.*
 

@@ -1,33 +1,36 @@
-package scrape
+package io.gitp.llmarticlewriter.scraper.scrape
 
-import PlaywrightBrowser
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
-import model.HockeyPage
-import model.League
+import io.gitp.llmarticlewriter.scraper.PlaywrightBrowser
+import io.gitp.llmarticlewriter.scraper.model.League
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonMatchUrlListPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonOneXTwoBetPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonOverUnderBetPage
+import io.gitp.llmarticlewriter.scraper.model.pages.hockey.HockeyMatchPage
 
 internal class HockeyScraper(
     private val browser: PlaywrightBrowser
 ) {
 
 
-    fun requestUpcommingMatchListPage(league: League): HockeyPage.UpcommingMatcListhPage = browser
+    fun requestUpcommingMatchListPage(league: League.Hockey): CommonMatchUrlListPage = browser
         .also { println("[INFO] requesting hockey-match-list (https://www.flashscore.co.kr/hockey/)") }
         .doAndGetDoc {
-            navigate(league.url)
+            navigate(league.matchListPageUrl)
         }
-        .let { HockeyPage.UpcommingMatcListhPage(it) }
+        .let { CommonMatchUrlListPage(it) }
 
 
-    fun requestMatchPage(matchPageUrl: String): HockeyPage.MatchPage = browser
+    fun requestMatchPage(matchPageUrl: String): HockeyMatchPage = browser
         .also { println("[INFO] requesting hockey-match-summary ($matchPageUrl)") }
         .doAndGetDoc {
             navigate(matchPageUrl)
             assertThat(locator("#detail")).isVisible()
         }
-        .let { HockeyPage.MatchPage(it) }
+        .let { HockeyMatchPage(it) }
 
 
-    fun requestOneXTwoBetPage(matchPageUrl: String): HockeyPage.OneXTwoBetPage = browser
+    fun requestOneXTwoBetPage(matchPageUrl: String): CommonOneXTwoBetPage = browser
         .also { println("[INFO] requesting hockey-1x2-bet ($matchPageUrl)") }
         .doAndGetDoc {
             navigate(matchPageUrl)
@@ -35,9 +38,9 @@ internal class HockeyScraper(
             locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(1)").click()
             assertThat(locator("#detail")).isVisible()
         }
-        .let { HockeyPage.OneXTwoBetPage(it) }
+        .let { CommonOneXTwoBetPage(it) }
 
-    fun requestOverUnderBetPage(matchPageUrl: String): HockeyPage.OverUnderBetPage = browser
+    fun requestOverUnderBetPage(matchPageUrl: String): CommonOverUnderBetPage = browser
         .also { println("[INFO] requesting hockey-totals-bet ($matchPageUrl)") }
         .doAndGetDoc {
             navigate(matchPageUrl)
@@ -45,7 +48,7 @@ internal class HockeyScraper(
             locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(3)").click()
             assertThat(locator("#detail")).isVisible()
         }
-        .let { HockeyPage.OverUnderBetPage(it) }
+        .let { CommonOverUnderBetPage(it) }
 }
 
 

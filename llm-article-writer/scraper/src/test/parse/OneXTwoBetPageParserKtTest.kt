@@ -1,7 +1,8 @@
 package parse
 
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonOneXTwoBetPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonOneXTwoBetPageParser.parseOdds
 import kotlinx.serialization.json.Json
-import model.HockeyPage
 import org.jsoup.Jsoup
 import org.junit.Test
 import readResourceFile
@@ -12,7 +13,7 @@ class OneXTwoBetPageParserTest {
     // 단순 출력 확인용
     @Test
     fun `parse odds test`() {
-        HockeyPage.OneXTwoBetPage(sampleHtml).parseOdds()
+        CommonOneXTwoBetPage(sampleHtml).parseOdds()
             .let { Json { prettyPrint = true }.encodeToString(it) }
             .also { println(it) }
     }

@@ -1,6 +1,6 @@
 package io.gitp.llmarticlewriter.cli
 
-import HockeyScrapeService
+import service.HockeyScrapeService
 import PlaywrightBrowser
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
@@ -9,12 +9,12 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import io.gitp.llmarticlewriter.database.*
-import model.HockeyMatchInfo
 import model.League
+import model.MatchInfo
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun HockeyMatchInfo.toHockeyMatchDto() = HockeyMatchDto(
+fun MatchInfo.toHockeyMatchDto() = MatchInfoDto(
     id = null,
     homeTeam = homeTeam,
     awayTeam = awayTeam,
@@ -23,7 +23,7 @@ fun HockeyMatchInfo.toHockeyMatchDto() = HockeyMatchDto(
     matchPageUrl = matchPageUrl
 )
 
-fun HockeyMatchInfo.toHockeyScrapedPageDto() = HockeyScrapedPageDto(
+fun MatchInfo.toHockeyScrapedPageDto() = HockeyScrapedPageDto(
     id = null,
     summary = matchSummary.toString(),
     oneXTwoBet = oneXTwoBet.toString(),
@@ -35,7 +35,7 @@ private class ScrapeCmdRoot : CliktCommand(name = "scrape") {
 }
 
 private class HockeyScrapeCmd : CliktCommand(name = "hockey") {
-    val league: League by option("--league", "-l").enum<League>().required()
+    val league: League.Hockey by option("--league", "-l").enum<League.Hockey>().required()
     override fun run() {
 
         val repo = getDBConnection("jdbc:sqlite:./test-data/dev-sqlite.db")
@@ -58,7 +58,7 @@ private class ArticleGenerateCmdRoot : CliktCommand(name = "generate") {
 }
 
 private class HockeyArticleGenerateCmd : CliktCommand(name = "hockey") {
-    val league: League by option("--league", "-l").enum<League>().required()
+    val league: League.Hockey by option("--league", "-l").enum<League.Hockey>().required()
     override fun run() {
         echo("selected league is ${league}")
     }

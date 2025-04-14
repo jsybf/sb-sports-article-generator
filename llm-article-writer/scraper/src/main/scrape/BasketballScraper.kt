@@ -1,21 +1,18 @@
-package scrape
+package io.gitp.llmarticlewriter.scraper.scrape
 
-import PlaywrightBrowser
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
-import model.Leaguee
-import model.basketball.BasketBallMatchPage
-import model.common.CommonMatchUrlListPage
-import model.common.CommonOneXTwoBetPage
-import model.common.CommonOverUnderBetPage
+import io.gitp.llmarticlewriter.scraper.PlaywrightBrowser
+import io.gitp.llmarticlewriter.scraper.model.League
+import io.gitp.llmarticlewriter.scraper.model.pages.basketball.BasketBallMatchPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonMatchUrlListPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonOneXTwoBetPage
+import io.gitp.llmarticlewriter.scraper.model.pages.common.CommonOverUnderBetPage
 
-enum class BasketBallLeague(val url: String) {
-    CBA("https://www.flashscore.co.kr/basketball/china/cba/fixtures/")
-}
 
 internal class BasketballScraper(
     private val browser: PlaywrightBrowser
 ) {
-    fun requestUpcommingMatchListPage(league: Leaguee.BasketBall): CommonMatchUrlListPage = browser
+    fun requestUpcommingMatchListPage(league: League.BasketBall): CommonMatchUrlListPage = browser
         .also { println("[INFO] requesting ${league.name} (${league.matchListPageUrl})") }
         .doAndGetDoc {
             navigate(league.matchListPageUrl)
@@ -54,7 +51,7 @@ internal class BasketballScraper(
 private fun main() {
     PlaywrightBrowser().use { browser ->
         val scraper = BasketballScraper(browser)
-        val matchUrlList = scraper.requestUpcommingMatchListPage(Leaguee.BasketBall.CBA).extractMatchUrls()
+        val matchUrlList = scraper.requestUpcommingMatchListPage(League.BasketBall.CBA).extractMatchUrls()
 
         matchUrlList
             .asSequence()

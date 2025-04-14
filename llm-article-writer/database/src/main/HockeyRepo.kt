@@ -1,6 +1,6 @@
 package io.gitp.llmarticlewriter.database
 
-import model.League
+import io.gitp.llmarticlewriter.scraper.model.League
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 
 
-data class HockeyMatchDto(
+data class MatchInfoDto(
     val id: Int?,
     val homeTeam: String,
     val awayTeam: String,
@@ -39,12 +39,12 @@ fun HockeyScrapedEntity.toDto() = HockeyScrapedPageDto(
     overUnderBet = this.overUnderBet,
 )
 
-fun HockeyMatchEntity.toDto() = HockeyMatchDto(
+fun HockeyMatchEntity.toDto() = MatchInfoDto(
     id = this.id.value,
     homeTeam = this.homeTeam,
     awayTeam = this.awayTeam,
     startAt = this.startAt,
-    league = this.league,
+    league = League.ofName(this.sport, this.league),
     matchPageUrl = this.matchPageUrl
 )
 
@@ -68,14 +68,15 @@ class HockeyRepo(
             .let { it != null }
     }
 
-    fun insertHockeyMatch(hockeyMatchDto: HockeyMatchDto): Int = transaction(db) {
+    fun insertHockeyMatch(matchInfoDto: MatchInfoDto): Int = transaction(db) {
         HockeyMatchEntity.new {
-            startAt = hockeyMatchDto.startAt
-            homeTeam = hockeyMatchDto.homeTeam
-            awayTeam = hockeyMatchDto.awayTeam
+            startAt = matchInfoDto.startAt
+            homeTeam = matchInfoDto.homeTeam
+            awayTeam = matchInfoDto.awayTeam
             updatedAt = LocalDateTime.now()
-            league = hockeyMatchDto.league
-            matchPageUrl = hockeyMatchDto.matchPageUrl
+            sport = matchInfoDto.league.sportsName
+            league = matchInfoDto.league.leagueName
+            matchPageUrl = matchInfoDto.matchPageUrl
         }.id.value
     }
 
@@ -99,7 +100,7 @@ class HockeyRepo(
         }.value
     }
 
-    fun findNotGeneratedMatches(): List<Pair<HockeyMatchDto, HockeyScrapedPageDto>> = transaction(db) {
+    fun findNotGeneratedMatches(): List<Pair<MatchInfoDto, HockeyScrapedPageDto>> = transaction(db) {
         HockeyMatchTbl
             .leftJoin(HockeyArticleTbl)
             .select(HockeyMatchEntity.dependsOnColumns)
@@ -113,7 +114,7 @@ class HockeyRepo(
             }
     }
 
-    fun findMatchesHavingArticle(): List<Triple<HockeyMatchDto, HockeyScrapedPageDto, HockeyArticleDto>> = transaction(db) {
+    fun findMatchesHavingArticle(): List<Triple<MatchInfoDto, HockeyScrapedPageDto, HockeyArticleDto>> = transaction(db) {
         HockeyMatchTbl
             .innerJoin(HockeyArticleTbl)
             .select(HockeyMatchEntity.dependsOnColumns)

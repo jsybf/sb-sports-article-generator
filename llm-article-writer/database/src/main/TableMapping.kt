@@ -1,6 +1,5 @@
 package io.gitp.llmarticlewriter.database
 
-import model.League
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -12,7 +11,8 @@ object HockeyMatchTbl : IntIdTable("hockey_match") {
     val homeTeam = text("home_team")
     val awayTeam = text("away_team")
     val updatedAt = datetime("updated_at")
-    val league = enumerationByName<League>("league", 10)
+    val sport = text("sport")
+    val league = text("league")
     val matchPageUrl = text("match_page_url")
 }
 
@@ -41,6 +41,7 @@ class HockeyMatchEntity(id: EntityID<Int>) : IntEntity(id) {
     var updatedAt by HockeyMatchTbl.updatedAt
     var matchPageUrl by HockeyMatchTbl.matchPageUrl
     var league by HockeyMatchTbl.league
+    var sport by HockeyMatchTbl.sport
 
     val scraped by HockeyScrapedEntity backReferencedOn HockeyScrapedTbl.hockeyMatchId
     val article by HockeyArticleEntity optionalBackReferencedOn HockeyArticleTbl.hockeyMatchId

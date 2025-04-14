@@ -1,13 +1,16 @@
-import model.Leaguee
-import model.MatchInfo
-import scrape.BasketballScraper
+package io.gitp.llmarticlewriter.scraper.service
+
+import io.gitp.llmarticlewriter.scraper.PlaywrightBrowser
+import io.gitp.llmarticlewriter.scraper.model.League
+import io.gitp.llmarticlewriter.scraper.model.MatchInfo
+import io.gitp.llmarticlewriter.scraper.scrape.BasketballScraper
 
 class BasketBallScrapeSrevice(
     browser: PlaywrightBrowser
 ) {
     private val baseketBallScraper = BasketballScraper(browser)
 
-    fun scrapeUpcommingMatch(league: Leaguee.BasketBall): Sequence<MatchInfo> =
+    fun scrapeUpcommingMatch(league: League.BasketBall): Sequence<MatchInfo> =
         baseketBallScraper
             .requestUpcommingMatchListPage(league)
             .extractMatchUrls()
@@ -33,11 +36,4 @@ class BasketBallScrapeSrevice(
                 }.getOrNull()
             }
             .filterNotNull()
-}
-
-// example
-private fun main() {
-    PlaywrightBrowser().use { browser ->
-        BasketBallScrapeSrevice(browser).scrapeUpcommingMatch(Leaguee.BasketBall.CBA).forEach { println(it) }
-    }
 }
