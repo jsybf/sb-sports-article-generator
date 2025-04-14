@@ -14,6 +14,7 @@
     <modules>
         <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/llm-writer</module>
+        <module>llm-article-writer/database</module>
     </modules>
 
     <properties>

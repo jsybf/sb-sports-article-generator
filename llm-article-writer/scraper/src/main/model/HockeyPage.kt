@@ -35,6 +35,7 @@ data class HockeyMatchInfo(
     val homeTeam: String,
     val matchAt: LocalDateTime,
     val league: League,
+    val matchPageUrl: String,
     val matchSummary: JsonObject,
     val oneXTwoBet: JsonArray,
     val overUnderBet: JsonArray,
