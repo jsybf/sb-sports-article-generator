@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
+            <artifactId>database</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.gitp.sports-article-writer</groupId>
             <artifactId>llm-writer</artifactId>
             <version>0.0.1</version>
         </dependency>
