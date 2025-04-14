@@ -6,7 +6,7 @@ import org.jsoup.Jsoup
 import org.junit.Test
 import readResourceFile
 
-class MatchPageParserTest {
+class BasketBallMatchPageParserTest {
     private val sampleHtml = readResourceFile("/match-page-sample.html").let { Jsoup.parse(it) }
 
     // 단순 출력 확인용
