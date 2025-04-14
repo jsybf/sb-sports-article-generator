@@ -1,18 +1,18 @@
 package io.gitp.llmarticlewriter.cli
 
-import service.HockeyScrapeService
-import PlaywrightBrowser
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
-import io.gitp.llmarticlewriter.database.*
-import model.League
-import model.MatchInfo
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
+import io.gitp.llmarticlewriter.cli.service.ScrapeService
+import io.gitp.llmarticlewriter.database.HockeyScrapedPageDto
+import io.gitp.llmarticlewriter.database.MatchInfoDto
+import io.gitp.llmarticlewriter.database.SportsRepository
+import io.gitp.llmarticlewriter.database.getSqliteConn
+import io.gitp.llmarticlewriter.scraper.model.League
+import io.gitp.llmarticlewriter.scraper.model.MatchInfo
 
 fun MatchInfo.toHockeyMatchDto() = MatchInfoDto(
     id = null,
@@ -37,19 +37,16 @@ private class ScrapeCmdRoot : CliktCommand(name = "scrape") {
 private class HockeyScrapeCmd : CliktCommand(name = "hockey") {
     val league: League.Hockey by option("--league", "-l").enum<League.Hockey>().required()
     override fun run() {
+        val scrapeService = ScrapeService(SportsRepository(getSqliteConn("jdbc:sqlite:./test-data/dev-sqlite.db")))
+        scrapeService.scrapeLeague(league)
+    }
+}
 
-        val repo = getDBConnection("jdbc:sqlite:./test-data/dev-sqlite.db")
-            .also { db -> transaction(db) { SchemaUtils.create(HockeyScrapedTbl, HockeyArticleTbl, HockeyScrapedTbl) } }
-            .let { db -> HockeyRepo(db) }
-
-        PlaywrightBrowser().use { browser ->
-            HockeyScrapeService(browser)
-                .scrapeUpcommingMatch(league)
-                .forEach { matchInfo ->
-                    val matchId = repo.insertHockeyMatch(matchInfo.toHockeyMatchDto())
-                    repo.insertHockeyScrapedPage(matchId, matchInfo.toHockeyScrapedPageDto())
-                }
-        }
+private class BasketBallScrapeCmd : CliktCommand(name = "basketball") {
+    val league: League.BasketBall by option("--league", "-l").enum<League.BasketBall>().required()
+    override fun run() {
+        val scrapeService = ScrapeService(SportsRepository(getSqliteConn("jdbc:sqlite:./test-data/dev-sqlite.db")))
+        scrapeService.scrapeLeague(league)
     }
 }
 
@@ -74,7 +71,7 @@ private class RootCmd : CliktCommand("saw") {
 
 fun main(args: Array<String>) = RootCmd()
     .subcommands(
-        ScrapeCmdRoot().subcommands(HockeyScrapeCmd()),
+        ScrapeCmdRoot().subcommands(HockeyScrapeCmd(), BasketBallScrapeCmd()),
         ArticleGenerateCmdRoot().subcommands(HockeyArticleGenerateCmd()),
         ExportCmd()
     ).main(args)

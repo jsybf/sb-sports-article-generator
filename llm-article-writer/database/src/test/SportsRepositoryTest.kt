@@ -8,29 +8,29 @@ import org.junit.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
 
-class HockeyRepoTest {
+class SportsRepositoryTest {
     private val db = Database.connect(
         "jdbc:sqlite::memory:",
         "org.sqlite.JDBC",
         databaseConfig = DatabaseConfig { sqlLogger = ExposedLogger }
     )
 
-    private val hockeyRepo = HockeyRepo(db)
+    private val sportsRepository = SportsRepository(db)
 
     @Test
     fun `test insert scenario`(): Unit = transaction(db) {
-        SchemaUtils.create(HockeyMatchTbl, HockeyScrapedTbl, HockeyArticleTbl)
+        SchemaUtils.create(SportsMatchTable, FlashScoreScrapedTbl, ArticleTbl)
         val match1 = MatchInfoDto(null, "team1", "team2", LocalDateTime.now(), League.Hockey.NHL, "www.sample1.com")
         val scraped1 = HockeyScrapedPageDto(null, "summary1", "oneXTwoBet1", "overUnderBet1")
         val article = HockeyArticleDto(null, "article1", 0, 0)
-        val matchId = hockeyRepo.insertHockeyMatch(match1)
-        hockeyRepo.insertHockeyScrapedPage(matchId, scraped1)
-        hockeyRepo.insertHockeyArticle(matchId, article)
+        val matchId = sportsRepository.insertHockeyMatch(match1)
+        sportsRepository.insertHockeyScrapedPage(matchId, scraped1)
+        sportsRepository.insertHockeyArticle(matchId, article)
     }
 
     @Test
     fun `test  scenario`(): Unit = transaction(db) {
-        SchemaUtils.create(HockeyMatchTbl, HockeyScrapedTbl, HockeyArticleTbl)
+        SchemaUtils.create(SportsMatchTable, FlashScoreScrapedTbl, ArticleTbl)
 
         val match1 = MatchInfoDto(null, "team1", "team2", LocalDateTime.now(), League.Hockey.KHL, "www.sample1.com")
         val scraped1 = HockeyScrapedPageDto(null, "summary1", "oneXTwoBet1", "overUnderBet1")
@@ -38,15 +38,15 @@ class HockeyRepoTest {
         val match2 = MatchInfoDto(null, "team2", "team3", LocalDateTime.now(), League.Hockey.KHL, "www.sample2.com")
         val scraped2 = HockeyScrapedPageDto(null, "summary2", "oneXTwoBet2", "overUnderBet2")
 
-        val matchId1 = hockeyRepo.insertHockeyMatch(match1)
-        hockeyRepo.insertHockeyScrapedPage(matchId1, scraped1)
-        hockeyRepo.insertHockeyArticle(matchId1, article1)
+        val matchId1 = sportsRepository.insertHockeyMatch(match1)
+        sportsRepository.insertHockeyScrapedPage(matchId1, scraped1)
+        sportsRepository.insertHockeyArticle(matchId1, article1)
 
-        val matchId2 = hockeyRepo.insertHockeyMatch(match1)
-        hockeyRepo.insertHockeyScrapedPage(matchId2, scraped2)
+        val matchId2 = sportsRepository.insertHockeyMatch(match1)
+        sportsRepository.insertHockeyScrapedPage(matchId2, scraped2)
         assertEquals(
             1,
-            hockeyRepo.findNotGeneratedMatches().count()
+            sportsRepository.findNotGeneratedMatches().count()
         )
     }
 }

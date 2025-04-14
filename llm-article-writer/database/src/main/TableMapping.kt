@@ -6,7 +6,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.javatime.datetime
 
-object HockeyMatchTbl : IntIdTable("hockey_match") {
+object SportsMatchTable : IntIdTable("sports_match") {
     val startAt = datetime("start_at")
     val homeTeam = text("home_team")
     val awayTeam = text("away_team")
@@ -16,51 +16,51 @@ object HockeyMatchTbl : IntIdTable("hockey_match") {
     val matchPageUrl = text("match_page_url")
 }
 
-object HockeyScrapedTbl : IntIdTable("hockey_scraped") {
-    val hockeyMatchId = reference("hockey_match_id", HockeyMatchTbl)
+object FlashScoreScrapedTbl : IntIdTable("flashscore_scraped") {
+    val hockeyMatchId = reference("sports_match_id", SportsMatchTable)
     val updatedAt = datetime("updated_at")
     val summary = text("summary")
     val oneXTwoBet = text("one_x_two_bet")
     val overUnderBet = text("over_under_bet")
 }
 
-object HockeyArticleTbl : IntIdTable("hockey_article") {
-    val hockeyMatchId = reference("hockey_match_id", HockeyMatchTbl)
+object ArticleTbl : IntIdTable("article") {
+    val hockeyMatchId = reference("sports_match_id", SportsMatchTable)
     val updatedAt = datetime("updated_at")
     val article = text("article")
     val inputTokens = integer("inputTokens")
     val outputTokens = integer("outputTokens")
 }
 
-class HockeyMatchEntity(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<HockeyMatchEntity>(HockeyMatchTbl)
+class SportsMatchEntity(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<SportsMatchEntity>(SportsMatchTable)
 
-    var startAt by HockeyMatchTbl.startAt
-    var homeTeam by HockeyMatchTbl.homeTeam
-    var awayTeam by HockeyMatchTbl.awayTeam
-    var updatedAt by HockeyMatchTbl.updatedAt
-    var matchPageUrl by HockeyMatchTbl.matchPageUrl
-    var league by HockeyMatchTbl.league
-    var sport by HockeyMatchTbl.sport
+    var startAt by SportsMatchTable.startAt
+    var homeTeam by SportsMatchTable.homeTeam
+    var awayTeam by SportsMatchTable.awayTeam
+    var updatedAt by SportsMatchTable.updatedAt
+    var matchPageUrl by SportsMatchTable.matchPageUrl
+    var league by SportsMatchTable.league
+    var sport by SportsMatchTable.sport
 
-    val scraped by HockeyScrapedEntity backReferencedOn HockeyScrapedTbl.hockeyMatchId
-    val article by HockeyArticleEntity optionalBackReferencedOn HockeyArticleTbl.hockeyMatchId
+    val scraped by FlashScoreScrapedEntity backReferencedOn FlashScoreScrapedTbl.hockeyMatchId
+    val article by ArticleEntity optionalBackReferencedOn ArticleTbl.hockeyMatchId
 }
 
-class HockeyScrapedEntity(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<HockeyScrapedEntity>(HockeyScrapedTbl)
+class FlashScoreScrapedEntity(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<FlashScoreScrapedEntity>(FlashScoreScrapedTbl)
 
-    var hockeyMatchEntity by HockeyMatchEntity referencedOn HockeyScrapedTbl.hockeyMatchId
-    var summary by HockeyScrapedTbl.summary
-    var oneXTwoBet by HockeyScrapedTbl.oneXTwoBet
-    var overUnderBet by HockeyScrapedTbl.overUnderBet
+    var sportsMatchEntity by SportsMatchEntity referencedOn FlashScoreScrapedTbl.hockeyMatchId
+    var summary by FlashScoreScrapedTbl.summary
+    var oneXTwoBet by FlashScoreScrapedTbl.oneXTwoBet
+    var overUnderBet by FlashScoreScrapedTbl.overUnderBet
 }
 
-class HockeyArticleEntity(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<HockeyArticleEntity>(HockeyArticleTbl)
+class ArticleEntity(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<ArticleEntity>(ArticleTbl)
 
-    var hockeyMatchEntity by HockeyMatchEntity referencedOn HockeyArticleTbl.hockeyMatchId
-    var article by HockeyArticleTbl.article
-    var inputTokens by HockeyArticleTbl.inputTokens
-    var outputTokens by HockeyArticleTbl.outputTokens
+    var sportsMatchEntity by SportsMatchEntity referencedOn ArticleTbl.hockeyMatchId
+    var article by ArticleTbl.article
+    var inputTokens by ArticleTbl.inputTokens
+    var outputTokens by ArticleTbl.outputTokens
 }
