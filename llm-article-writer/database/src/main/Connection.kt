@@ -4,8 +4,11 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.nio.file.Path
 
 // "jdbc:sqlite::memory:",
+fun getSqliteConn(sqlitePath: Path) = getSqliteConn("jdbc:sqlite:${sqlitePath.normalize()}")
+
 fun getSqliteConn(jdbcUrl: String) =
     Database
         .connect(
