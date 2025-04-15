@@ -1,3 +1,5 @@
+package io.gitp.llmarticlewriter.scraper
+
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.Playwright
 import org.jsoup.Jsoup

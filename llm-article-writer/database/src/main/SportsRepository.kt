@@ -1,6 +1,6 @@
 package io.gitp.llmarticlewriter.database
 
-import model.League
+import io.gitp.llmarticlewriter.scraper.model.League
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 
 
-data class HockeyMatchDto(
+data class MatchInfoDto(
     val id: Int?,
     val homeTeam: String,
     val awayTeam: String,
@@ -18,69 +18,70 @@ data class HockeyMatchDto(
 )
 
 
-data class HockeyScrapedPageDto(
+data class ScrapedPageDto(
     val id: Int?,
     val summary: String,
     val oneXTwoBet: String,
     val overUnderBet: String,
 )
 
-data class HockeyArticleDto(
+data class ArticleDto(
     val id: Int?,
     val article: String,
-    val inputTokens: Int,
-    val outputTokens: Int
+    val inputTokens: Long,
+    val outputTokens: Long
 )
 
-fun HockeyScrapedEntity.toDto() = HockeyScrapedPageDto(
+fun FlashScoreScrapedEntity.toDto() = ScrapedPageDto(
     id = this.id.value,
     summary = this.summary,
     oneXTwoBet = this.oneXTwoBet,
     overUnderBet = this.overUnderBet,
 )
 
-fun HockeyMatchEntity.toDto() = HockeyMatchDto(
+fun SportsMatchEntity.toDto() = MatchInfoDto(
     id = this.id.value,
     homeTeam = this.homeTeam,
     awayTeam = this.awayTeam,
     startAt = this.startAt,
-    league = this.league,
+    league = League.ofName(this.sport, this.league),
     matchPageUrl = this.matchPageUrl
 )
 
-fun HockeyArticleEntity.toDto() = HockeyArticleDto(
+fun ArticleEntity.toDto() = ArticleDto(
     id = this.id.value,
     article = this.article,
     inputTokens = this.inputTokens,
     outputTokens = this.outputTokens
 )
 
-class HockeyRepo(
+class SportsRepository(
     private val db: Database
 ) {
     fun ifExists(homeTeam: String, awayTeam: String, startAt: LocalDateTime): Boolean = transaction(db) {
-        HockeyMatchTbl
-            .select(HockeyMatchTbl.id)
-            .andWhere { HockeyMatchTbl.homeTeam eq homeTeam }
-            .andWhere { HockeyMatchTbl.homeTeam eq awayTeam }
-            .andWhere { HockeyMatchTbl.startAt eq startAt }
+        SportsMatchTable
+            .select(SportsMatchTable.id)
+            .andWhere { SportsMatchTable.homeTeam eq homeTeam }
+            .andWhere { SportsMatchTable.homeTeam eq awayTeam }
+            .andWhere { SportsMatchTable.startAt eq startAt }
             .singleOrNull()
             .let { it != null }
     }
 
-    fun insertHockeyMatch(hockeyMatchDto: HockeyMatchDto): Int = transaction(db) {
-        HockeyMatchEntity.new {
-            startAt = hockeyMatchDto.startAt
-            homeTeam = hockeyMatchDto.homeTeam
-            awayTeam = hockeyMatchDto.awayTeam
+    fun insertMatch(matchInfoDto: MatchInfoDto): Int = transaction(db) {
+        SportsMatchEntity.new {
+            startAt = matchInfoDto.startAt
+            homeTeam = matchInfoDto.homeTeam
+            awayTeam = matchInfoDto.awayTeam
             updatedAt = LocalDateTime.now()
-            league = hockeyMatchDto.league
-            matchPageUrl = hockeyMatchDto.matchPageUrl
+            sport = matchInfoDto.league.sportsName
+            league = matchInfoDto.league.leagueName
+            matchPageUrl = matchInfoDto.matchPageUrl
         }.id.value
     }
 
-    fun insertHockeyScrapedPage(matchId: Int, dto: HockeyScrapedPageDto): Int = transaction(db) {
-        HockeyScrapedTbl.insertAndGetId {
+    fun insertScrapedPage(matchId: Int, dto: ScrapedPageDto): Int = transaction(db) {
+        FlashScoreScrapedTbl.insertAndGetId {
             it[hockeyMatchId] = matchId
             it[updatedAt] = LocalDateTime.now()
             it[summary] = dto.summary
@@ -89,8 +90,8 @@ class HockeyRepo(
         }.value
     }
 
-    fun insertHockeyArticle(matchId: Int, dto: HockeyArticleDto): Int = transaction(db) {
-        HockeyArticleTbl.insertAndGetId {
+    fun insertArticle(matchId: Int, dto: ArticleDto): Int = transaction(db) {
+        ArticleTbl.insertAndGetId {
             it[hockeyMatchId] = matchId
             it[updatedAt] = LocalDateTime.now()
             it[article] = dto.article
@@ -99,12 +100,12 @@ class HockeyRepo(
         }.value
     }
 
-    fun findNotGeneratedMatches(): List<Pair<HockeyMatchDto, HockeyScrapedPageDto>> = transaction(db) {
-        HockeyMatchTbl
-            .leftJoin(HockeyArticleTbl)
-            .select(HockeyMatchEntity.dependsOnColumns)
-            .where { HockeyArticleTbl.id eq null }
-            .let { HockeyMatchEntity.wrapRows(it) }
+    fun findNotGeneratedMatches(): List<Pair<MatchInfoDto, ScrapedPageDto>> = transaction(db) {
+        SportsMatchTable
+            .leftJoin(ArticleTbl)
+            .select(SportsMatchEntity.dependsOnColumns)
+            .where { ArticleTbl.id eq null }
+            .let { SportsMatchEntity.wrapRows(it) }
             .map { matchEntity ->
                 Pair(
                     matchEntity.toDto(),
@@ -113,11 +114,11 @@ class HockeyRepo(
             }
     }
 
-    fun findMatchesHavingArticle(): List<Triple<HockeyMatchDto, HockeyScrapedPageDto, HockeyArticleDto>> = transaction(db) {
-        HockeyMatchTbl
-            .innerJoin(HockeyArticleTbl)
-            .select(HockeyMatchEntity.dependsOnColumns)
-            .let { HockeyMatchEntity.wrapRows(it) }
+    fun findMatchesHavingArticle(): List<Triple<MatchInfoDto, ScrapedPageDto, ArticleDto>> = transaction(db) {
+        SportsMatchTable
+            .innerJoin(ArticleTbl)
+            .select(SportsMatchEntity.dependsOnColumns)
+            .let { SportsMatchEntity.wrapRows(it) }
             .map { matchEntity ->
                 Triple(
                     matchEntity.toDto(),

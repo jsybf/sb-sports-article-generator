@@ -13,6 +13,7 @@
 
     <modules>
         <module>llm-article-writer/scraper</module>
+        <module>llm-article-writer/cli</module>
         <module>llm-article-writer/llm-writer</module>
         <module>llm-article-writer/database</module>
     </modules>
@@ -25,6 +26,8 @@
         <ktor.version>3.1.2</ktor.version>
         <exposed.version>0.60.0</exposed.version>
         <sports-article-writer.version>0.0.1</sports-article-writer.version>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
     </properties>
 
     <dependencies>

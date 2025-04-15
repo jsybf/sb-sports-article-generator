@@ -16,6 +16,8 @@
 
     <properties>
         <serialization.version>1.8.0</serialization.version>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
     </properties>
 
 
