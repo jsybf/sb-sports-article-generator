@@ -1,5 +1,7 @@
 package io.gitp.llmarticlewriter.scraper.scrape
 
+import com.microsoft.playwright.CLI
+import com.microsoft.playwright.Playwright
 import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import io.gitp.llmarticlewriter.scraper.PlaywrightBrowser
 import io.gitp.llmarticlewriter.scraper.model.League
@@ -57,17 +59,5 @@ private fun main() {
             .asSequence()
             .map { url -> scraper.requestMatchPage(url).extractMatchInfo() }
             .forEach { println(it) }
-
-        //
-        // resp
-        //     .extractMatchUrls()
-        //     .asSequence()
-        //     .map { matchUrl -> scraper.requestOverUnderBetPage(matchUrl) }
-        //     .map { overUnderBetPage -> overUnderBetPage.extractOdds() }
-        //     .filter { overUnderBet -> overUnderBet.size != 0 }
-        //     .onEach { overUnderBet -> println(overUnderBet) }
-        //     .forEach { }
-        // .map { matchUrl -> scraper.requestOneXTwoBetPage(matchUrl) }
-        // .onEach { oneXTwoBetPage -> oneXTwoBetPage.extractOdds().let { println(it) } }
     }
 }

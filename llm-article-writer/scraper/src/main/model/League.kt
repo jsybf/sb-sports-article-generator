@@ -24,7 +24,7 @@ sealed interface League {
     }
 
     companion object {
-        private val allLeagues: Set<League> = (BasketBall.entries + Hockey.entries).toSet()
+        val allLeagues: Set<League> = (BasketBall.entries + Hockey.entries).toSet()
         fun ofName(sportName: String, leagueName: String): League = allLeagues.find { it.sportsName == sportName && it.leagueName == leagueName }
             ?: throw Exception("cant find League Enum with sportName:$sportName leagueName:$leagueName")
     }
