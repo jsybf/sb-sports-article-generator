@@ -86,11 +86,6 @@ private class InstallBrowserCmd : CliktCommand(name = "install-browser") {
     }
 }
 
-
-// private class ExportCmd : CliktCommand(name = "export") {
-//     override fun run() = Unit
-// }
-
 private class RootCmd : CliktCommand("root") {
     override fun run() = Unit
 }
@@ -101,5 +96,4 @@ fun main(args: Array<String>) = RootCmd()
         ArticleGenerateCmdRoot(),
         InstallBrowserCmd(),
         ShowSupportedSportsLeagueCmd()
-        // ExportCmd(),
     ).main(args)

@@ -20,6 +20,7 @@ internal class ScrapeService(
         }
 
         matchList
+            .filter { matchInfo: MatchInfo -> !repo.ifExists(matchInfo.homeTeam, matchInfo.awayTeam, matchInfo.matchAt) }
             .forEach { matchInfo ->
                 val matchId = repo.insertMatch(matchInfo.toMatchInfoDto())
                 repo.insertScrapedPage(matchId, matchInfo.toScrapedPageDto())

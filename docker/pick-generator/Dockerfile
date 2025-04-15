@@ -7,6 +7,7 @@ COPY llm-article-writer/cli/pom.xml llm-article-writer/cli/pom.xml
 COPY llm-article-writer/database/pom.xml llm-article-writer/database/pom.xml
 COPY llm-article-writer/llm-writer/pom.xml llm-article-writer/llm-writer/pom.xml
 COPY llm-article-writer/scraper/pom.xml llm-article-writer/scraper/pom.xml
+COPY download-server/pom.xml download-server/pom.xml
 COPY pom.xml pom.xml
 
 RUN mvn -B -e dependency:go-offline
@@ -18,6 +19,7 @@ WORKDIR /opt/app
 
 COPY --from=dependencies /root/.m2 /root/.m2
 COPY llm-article-writer  llm-article-writer
+COPY download-server  download-server
 COPY pom.xml pom.xml
 
 RUN mvn -B -e clean install -DskipTests

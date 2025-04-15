@@ -35,7 +35,7 @@ internal class LLMArticleGenerateService(
             .map { (matchInfo, scrapedPage) ->
                 val resp = claudeClient.requestStreaming {
                     model(Model.CLAUDE_3_7_SONNET_LATEST)
-                    maxTokens(2048L)
+                    maxTokens(4000L)
                     system(systemPrompt)
                     addUserMessage(scrapedPage.toLLMQuery())
                 }
