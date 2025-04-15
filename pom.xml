@@ -12,6 +12,7 @@
     <name>sports-article-writer</name>
 
     <modules>
+        <module>pick-download-server</module>
         <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/cli</module>
         <module>llm-article-writer/llm-writer</module>
