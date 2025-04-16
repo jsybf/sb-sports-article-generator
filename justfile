@@ -6,3 +6,6 @@ pick-generator-docker-build:
 
 download-server-docker-build:
     docker build -t download-server:{{ download_server_version }} -f ./docker/download-server/Dockerfile .
+
+cli-package:
+    mvn -T 1C package -pl ./llm-article-writer/cli -am -DskipTests
