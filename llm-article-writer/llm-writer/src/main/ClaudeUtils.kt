@@ -3,10 +3,14 @@ package io.gitp.llmarticlewriter.llmwriterv2
 import com.anthropic.client.AnthropicClient
 import com.anthropic.core.http.StreamResponse
 import com.anthropic.errors.RateLimitException
+import com.anthropic.errors.SseException
 import com.anthropic.models.messages.MessageCreateParams
 import com.anthropic.models.messages.RawMessageStreamEvent
+import java.time.Duration
 import kotlin.jvm.optionals.getOrNull
 import kotlin.streams.asSequence
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 /**
  * 추상화를 하는 이유(나는 추상화 싫어함)
@@ -22,7 +26,7 @@ data class ClaudeResp(
     val message: String
 )
 
-fun AnthropicClient.requestStreaming(retry: Int = 1, paramBuildBlock: MessageCreateParams.Builder.() -> Unit): ClaudeResp {
+fun AnthropicClient.requestStreaming(retry: Int = 3, paramBuildBlock: MessageCreateParams.Builder.() -> Unit): ClaudeResp {
     val param = MessageCreateParams.builder()
         .apply(paramBuildBlock)
         .build()
@@ -63,12 +67,14 @@ internal fun StreamResponse<RawMessageStreamEvent>.handleStream(): ClaudeResp {
     return ClaudeResp(inputToken, outputToken, responseBuilder.toString())
 }
 
-internal inline fun <reified T> claudeRetry(retry: Int, block: () -> T): T {
+internal inline fun <reified T> claudeRetry(retry: Int, sleepTime: Duration = 10.seconds.toJavaDuration(), block: () -> T): T {
     for (tryCnt in 1..retry) {
         val result = runCatching { block() }
         result.onSuccess { return it }
         result.onFailure { exception: Throwable ->
-            if (exception !is RateLimitException) throw exception
+            if (exception !is RateLimitException && exception !is SseException) throw exception
+            println("[ERROR] got ${exception} gonna sleep ${sleepTime}")
+            Thread.sleep(sleepTime)
         }
     }
     throw Exception("exceed max retry")
