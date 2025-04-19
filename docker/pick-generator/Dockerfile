@@ -34,4 +34,4 @@ RUN java -jar ${cliJar} install-browser
 # 아래의 환경변수를 세팅안해주면 firfox, webkit을 컨테이너를 실행할따마다 다운로드 받음
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
-ENTRYPOINT java -jar ${cliJar} scrape --db /opt/app/db/sqlite.db --all && java -jar ${cliJar} generate --db /opt/app/db/sqlite.db 
+CMD java -jar cli-0.0.1.jar scrape --db /opt/app/db/sqlite.db --all && java -jar cli-0.0.1.jar generate --db /opt/app/db/sqlite.db 
