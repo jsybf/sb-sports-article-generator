@@ -62,7 +62,7 @@ class SportsRepository(
         SportsMatchTable
             .select(SportsMatchTable.id)
             .andWhere { SportsMatchTable.homeTeam eq homeTeam }
-            .andWhere { SportsMatchTable.homeTeam eq awayTeam }
+            .andWhere { SportsMatchTable.awayTeam eq awayTeam }
             .andWhere { SportsMatchTable.startAt eq startAt }
             .singleOrNull()
             .let { it != null }

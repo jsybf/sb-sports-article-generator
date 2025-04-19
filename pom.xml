@@ -12,6 +12,7 @@
     <name>sports-article-writer</name>
 
     <modules>
+        <module>download-server</module>
         <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/cli</module>
         <module>llm-article-writer/llm-writer</module>
@@ -23,11 +24,12 @@
         <kotlin.version>2.1.10</kotlin.version>
         <kotlin.code.style>official</kotlin.code.style>
         <junit.version>4.13.1</junit.version>
-        <ktor.version>3.1.2</ktor.version>
         <exposed.version>0.60.0</exposed.version>
+        <slf4j_version>2.0.9</slf4j_version>
         <sports-article-writer.version>0.0.1</sports-article-writer.version>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
+        <logback_version>1.4.14</logback_version>
     </properties>
 
     <dependencies>

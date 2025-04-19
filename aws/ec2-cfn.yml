@@ -1,0 +1,70 @@
+Parameters:
+  Ec2InstanceType:
+    Type: String
+    Default: t4g.small
+
+  Ec2AmiId:
+    Type: String
+    Default: ami-040d95a011eb27003 # amazon linux 2 arm64
+
+  Ec2KeyName:
+    Type: String
+    Default: foo_key_pair
+
+  Ec2Name: 
+    Type: String
+
+  EbsVolumeSize:
+    Type: Number
+
+Resources:
+  Ec2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow minimal access for EC2
+      SecurityGroupIngress:
+        - IpProtocol: '-1'
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+  EbsVolume:
+    Type: AWS::EC2::Volume
+    Properties:
+      Size: !Ref EbsVolumeSize
+      VolumeType: gp3
+      AvailabilityZone: !GetAtt Ec2Instance.AvailabilityZone
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}__ebs"
+
+  VolumeAttachment:
+    Type: AWS::EC2::VolumeAttachment
+    Properties:
+      InstanceId: !Ref Ec2Instance
+      VolumeId: !Ref EbsVolume
+      Device: /dev/sdf
+
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref Ec2InstanceType
+      ImageId: !Ref Ec2AmiId
+      KeyName: !Ref Ec2KeyName
+      SecurityGroupIds:
+        - !Ref Ec2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Ref Ec2Name
+
+Outputs:
+  Ec2SecurityGroupId:
+    Description: Physical ID of the EC2 Security Group
+    Value: !Ref Ec2SecurityGroup
+  Ec2InstanceId:
+    Description: Physical ID of the EC2 Instance
+    Value: !Ref Ec2Instance
+  Ec2PublicIp:
+    Description: Ec2 public ip
+    Value: !GetAtt Ec2Instance.PublicIp
+    
