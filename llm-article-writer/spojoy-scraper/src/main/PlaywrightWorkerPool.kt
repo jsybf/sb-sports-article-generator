@@ -53,8 +53,8 @@ class PlaywrightWorkerPool(
         }
     }
 
-    fun submitTask(actions: Page.() -> Unit): Future<Document> {
-        return executorService.submit<Document> { this.doAndGetDoc(actions) }
+    fun submitTask(actions: Page.() -> Unit): CompletableFuture<Document> {
+        return CompletableFuture.supplyAsync({ this.doAndGetDoc(actions) }, executorService)
     }
 
     override fun close() {
