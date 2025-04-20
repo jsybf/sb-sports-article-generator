@@ -7,9 +7,9 @@ import io.gitp.llmarticlewrtier.spojoyscraper.model.BaseballMatchListPage
  * "javascript:openSpoDB(402775,'baseball','S','D');"
  * output은 402775(spojoy website의 mlb page id. 예시 https://spodb.spojoy.com/?game_id=402775 이런식)
  */
-val extractMatchIdFromHref = Regex("""[0-9]+""")
+private val extractMatchIdFromHref = Regex("""[0-9]+""")
 
-fun BaseballMatchListPage.parseMlbMatchList(): List<String> {
+internal fun BaseballMatchListPage.parseMlbMatchList(): List<String> {
     val aElements = this.doc.select("#ScheduleBox td #spodb_ a")
     return aElements
         .filter { aElement -> aElement.text() == "비교분석" }
