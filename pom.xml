@@ -12,6 +12,7 @@
     <name>sports-article-writer</name>
 
     <modules>
+        <module>pick-generator/scraper/scraper-base</module>
         <module>download-server</module>
         <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/spojoy-scraper</module>
@@ -30,7 +31,17 @@
         <sports-article-writer.version>0.0.1</sports-article-writer.version>
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
+
+        <!--dependencey_versions-->
         <logback_version>1.4.14</logback_version>
+        <serialization.version>1.8.0</serialization.version>
+
+        <dep.version.logback>1.4.14</dep.version.logback>
+        <dep.version.jsoup>1.19.1</dep.version.jsoup>
+        <dep.version.playwright>1.51.0</dep.version.playwright>
+        <dep.version.kotlinx-serialization>1.8.0</dep.version.kotlinx-serialization>
+        <dep.version.logback>1.4.14</dep.version.logback>
+
     </properties>
 
     <dependencies>
