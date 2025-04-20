@@ -3,7 +3,7 @@ package io.gitp.llmarticlewrtier.spojoyscraper.extractor
 import io.gitp.llmarticlewrtier.spojoyscraper.model.BaseballPlayerListPage
 
 private val extractPlayerCode = Regex("""[0-9]+""")
-fun BaseballPlayerListPage.extractPlayerPageUrl(): List<String> {
+internal fun BaseballPlayerListPage.extractPlayerPageUrl(): List<String> {
     return this.doc
         .select("""tr[height="50"]""")
         .asIterable()

@@ -7,7 +7,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.jsoup.nodes.Document
 
-fun BaseballPlayerPage.extractPlayerInfo(): JsonObject {
+internal fun BaseballPlayerPage.extractPlayerInfo(): JsonObject {
     val doc: Document = this.doc
 
     // 선수 기본 정보 추출

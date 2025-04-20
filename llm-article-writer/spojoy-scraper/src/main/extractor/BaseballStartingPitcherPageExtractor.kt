@@ -5,7 +5,7 @@ import kotlinx.serialization.json.*
 import org.jsoup.nodes.Document
 
 
-fun StartingPitcerPage.extractPitcherStats(): JsonObject {
+internal fun StartingPitcerPage.extractPitcherStats(): JsonObject {
     return buildJsonObject {
         put("homePitcher", extractPitcherInfo(this@extractPitcherStats.doc, "home"))
         put("awayPitcher", extractPitcherInfo(this@extractPitcherStats.doc, "away"))
