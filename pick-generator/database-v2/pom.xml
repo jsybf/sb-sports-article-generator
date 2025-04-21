@@ -9,7 +9,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>persist</artifactId>
+    <artifactId>database-v2</artifactId>
     <packaging>jar</packaging>
 
 
