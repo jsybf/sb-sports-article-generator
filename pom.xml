@@ -15,6 +15,7 @@
         <module>pick-generator/scraper/scraper-base</module>
         <module>pick-generator/scraper/hockey-scraper</module>
         <module>pick-generator/scraper/baseball-scraper</module>
+        <module>pick-generator/scraper/basketball-scraper</module>
         <module>download-server</module>
         <module>llm-article-writer/scraper</module>
         <module>llm-article-writer/spojoy-scraper</module>
