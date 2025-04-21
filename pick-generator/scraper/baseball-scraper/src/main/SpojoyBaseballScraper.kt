@@ -7,12 +7,12 @@ import kotlinx.coroutines.coroutineScope
 import java.net.URI
 
 
-internal class SpoJoyBaseballScraper(
+internal class SpojoyBaseballScraper(
     private val browserPool: PlaywrightBrowserPool
 ) {
     suspend fun scrapeMatchListPage(): BaseballMatchListPage {
         val matchListPageURL = "https://www.spojoy.com/live/?mct=baseball"
-        return this@SpoJoyBaseballScraper.browserPool
+        return this@SpojoyBaseballScraper.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping spojoy-baseball-match-list-page (url=${matchListPageURL})")
                 navigate(matchListPageURL)
@@ -42,7 +42,7 @@ internal class SpoJoyBaseballScraper(
     }
 
     suspend fun scrapePlayerListPage(matchPageUrl: URI): Pair<BaseballPlayerListPage, BaseballPlayerListPage> = coroutineScope {
-        val baseballMatchPage = this@SpoJoyBaseballScraper.browserPool.doAndGetDocAsync {
+        val baseballMatchPage = this@SpojoyBaseballScraper.browserPool.doAndGetDocAsync {
             logger.debug("scraping spojoy-baseball-player-list-page (matchPageUrl=${matchPageUrl})")
             navigate(matchPageUrl.toString())
         }
@@ -55,7 +55,7 @@ internal class SpoJoyBaseballScraper(
 
 
         val homePlayerListPage = async {
-            this@SpoJoyBaseballScraper.browserPool
+            this@SpojoyBaseballScraper.browserPool
                 .doAndGetDocAsync {
                     logger.debug("requesting spojoy-baseball-player-list-page (homeTeamPlayerListPageUrl=${homePlayerListPageUrl}")
                     navigate(homePlayerListPageUrl)
@@ -65,7 +65,7 @@ internal class SpoJoyBaseballScraper(
         }
 
         val awayPlayerListPage = async {
-            this@SpoJoyBaseballScraper.browserPool
+            this@SpojoyBaseballScraper.browserPool
                 .doAndGetDocAsync {
                     logger.debug("requesting spojoy-baseball-player-list-page (awayTeamPlayerListPageUrl=${awayPlayerListPageUrl}")
                     navigate(awayPlayerListPageUrl)

@@ -1,5 +1,7 @@
 package io.gitp.sbpick.pickgenerator.scraper.scrapebase.models
 
+import java.net.URI
+
 sealed interface League {
     val sportsName: String
     val leagueName: String
@@ -18,8 +20,9 @@ sealed interface League {
         CBA("CBA"),
     }
 
-    enum class Hockey(override val leagueName: String, override val sportsName: String = "hockey") : League {
-        NHL("NHL"), KHL("KHL"),
+    enum class Hockey(override val leagueName: String, val matchListPageUrl: URI, override val sportsName: String = "hockey") : League {
+        NHL("NHL", URI("https://www.flashscore.co.kr/hockey/usa/nhl/fixtures/")),
+        KHL("KHL", URI("https://www.flashscore.co.kr/hockey/russia/khl/fixtures/")),
     }
 
     enum class Baseball(override val leagueName: String, override val sportsName: String = "baseball") : League {

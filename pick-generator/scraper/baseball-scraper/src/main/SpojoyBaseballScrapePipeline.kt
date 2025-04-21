@@ -16,7 +16,7 @@ class SpojoyBaseballScrapePipeline(
     browserPool: PlaywrightBrowserPool
 ) : ScrapePipeline<BaseballMatchInfo> {
 
-    private val scraper = SpoJoyBaseballScraper(browserPool)
+    private val scraper = SpojoyBaseballScraper(browserPool)
 
     override suspend fun getFixtureUrl(): List<URI> {
         logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
