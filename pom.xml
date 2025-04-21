@@ -41,6 +41,7 @@
         <dep.version.playwright>1.51.0</dep.version.playwright>
         <dep.version.kotlinx-serialization>1.8.0</dep.version.kotlinx-serialization>
         <dep.version.logback>1.4.14</dep.version.logback>
+        <dep.version.kotlinx-coroutine>1.10.2</dep.version.kotlinx-coroutine>
 
     </properties>
 
