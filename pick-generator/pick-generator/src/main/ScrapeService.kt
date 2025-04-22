@@ -36,11 +36,10 @@ internal class ScraperPipelineContainer(
 // TODO: enum에 파일 프로퍼티를 추가하든 해야할 듯. 매호출마다 파일을 다시 읽어드림...
 internal fun readResourceFile(path: String): String = object {}::class.java.getResource(path)?.readText() ?: throw Exception("can't find ${path} in resource")
 
-internal fun getPromptByLeague(league: League) = when (league) {
+internal fun getPromptByLeague(league: League): String = when (league) {
     is League.Basketball -> readResourceFile("/basketball-prompt.txt")
     is League.Hockey -> readResourceFile("/hockey-prompt.txt")
-    // is League.Baseball -> readResourceFile("/prompt/hockey-prompt.txt")
-    else -> throw Exception("")
+    is League.Baseball -> readResourceFile("/baseball-prompt.txt")
 }
 
 internal suspend fun scrapeAndGeneratePick(
@@ -52,17 +51,17 @@ internal suspend fun scrapeAndGeneratePick(
     filteringUrls: Set<String>
 ) = coroutineScope {
     for (league in leagues) {
-        val scrapePipeline = scrapePipelineContainer.getByLeague(league)
-        val matchUrls = scrapePipeline.getFixtureUrl(league).subtract(filteringUrls)
+        val scrapePipeline = scrapePipelineContainer.getByLeague(league) // 1. league로 ScrapePipelineContainer가져오기
+        val matchUrls = scrapePipeline.getFixtureUrl(league).subtract(filteringUrls) // 2. match page url들 가져오기.(이미 디비에 저장된 데이터의 중복을 피하기 위해 filteringUrls 를 제외하고)
         with(scrapePipeline) { scrape(matchUrls.toList()) }
             .consumeEach { (matchInfo: MatchInfo, scrapeResult: LLMAttachment) ->
-                val generatedPick: ClaudeResp = claudeClient.requestAsync(2, Duration.ofSeconds(60)) {
+                val generatedPick: ClaudeResp = claudeClient.requestAsync(2, Duration.ofSeconds(60)) { // 3. pick 글 생성
                     model(Model.CLAUDE_3_7_SONNET_20250219)
                     maxTokens(4000L)
                     system(getPromptByLeague(league))
                     addUserMessage(scrapeResult.toLLMAttachment())
                 }
-                val matchId = sportsMatchRepo.insertMatchAndGetId(SportsMatchDto.from(matchInfo))
+                val matchId = sportsMatchRepo.insertMatchAndGetId(SportsMatchDto.from(matchInfo)) // 4. db에 경기정보와 pick 글 저장
                 pickRepo.insertAndGetId(matchId, generatedPick.message, generatedPick.inputTokens, generatedPick.outputTokens)
             }
     }
