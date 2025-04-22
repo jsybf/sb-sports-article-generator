@@ -25,6 +25,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.1.10</kotlin.version>
+        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <kotlin.code.style>official</kotlin.code.style>
         <junit.version>4.13.1</junit.version>
         <exposed.version>0.60.0</exposed.version>
@@ -46,7 +47,7 @@
         <dep.version.mysql-jdbc>9.2.0</dep.version.mysql-jdbc>
         <dep.version.antropic>1.1.0</dep.version.antropic>
         <dep.version.clikt>5.0.1</dep.version.clikt>
-
+        <dep.version.ktor>3.1.1</dep.version.ktor>
 
     </properties>
 
