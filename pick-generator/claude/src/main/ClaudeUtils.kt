@@ -34,7 +34,7 @@ suspend fun AnthropicClient.requestAsync(
             inputTokens = resp.usage().inputTokens().toUInt(),
             outputTokens = resp.usage().outputTokens().toUInt(),
             message = resp.content().map { it.text().getOrNull()!!.text() }.joinToString("\n")
-        ).also { logger.info("inputTokens:{} outputTokens:{}", it.inputTokens, it.outputTokens) }
+        ).also { logger.info("inputTokens:{} outputTokens:{} cachedPromptTokens", it.inputTokens, it.outputTokens, resp.usage().cacheReadInputTokens()) }
     }
 }
 

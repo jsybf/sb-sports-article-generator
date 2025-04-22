@@ -1,7 +1,9 @@
 package io.gitp.sbpick.pickgenerator.pickgenerator
 
 import com.anthropic.client.AnthropicClient
+import com.anthropic.models.messages.CacheControlEphemeral
 import com.anthropic.models.messages.Model
+import com.anthropic.models.messages.TextBlockParam
 import io.gitp.pickgenerator.claude.models.ClaudeResp
 import io.gitp.pickgenerator.claude.requestAsync
 import io.gitp.sbpick.pickgenerator.database.models.SportsMatchDto
@@ -58,7 +60,14 @@ internal suspend fun scrapeAndGeneratePick(
                 val generatedPick: ClaudeResp = claudeClient.requestAsync(2, Duration.ofSeconds(60)) { // 3. pick 글 생성
                     model(Model.CLAUDE_3_7_SONNET_20250219)
                     maxTokens(4000L)
-                    system(getPromptByLeague(league))
+                    systemOfTextBlockParams(
+                        listOf(
+                            TextBlockParam.builder()
+                                .text(getPromptByLeague(league))
+                                .cacheControl(CacheControlEphemeral.builder().build())
+                                .build()
+                        )
+                    )
                     addUserMessage(scrapeResult.toLLMAttachment())
                 }
                 val matchId = sportsMatchRepo.insertMatchAndGetId(SportsMatchDto.from(matchInfo)) // 4. db에 경기정보와 pick 글 저장
