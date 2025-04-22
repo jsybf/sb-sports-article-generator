@@ -11,7 +11,4 @@ data class BasketballMatchInfo(
     override val homeTeam: String,
     override val matchAt: LocalDateTime,
     override val league: League,
-    val matchSummary: JsonObject,
-    val oneXTwoBet: JsonArray,
-    val overUnderBet: JsonArray,
 ) : MatchInfo

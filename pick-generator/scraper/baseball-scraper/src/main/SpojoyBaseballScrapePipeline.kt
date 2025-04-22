@@ -2,8 +2,10 @@ package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.extractors.*
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballMatchInfo
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballScraped
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.StartingPitcerPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
 import kotlinx.coroutines.*
@@ -19,18 +21,13 @@ class SpojoyBaseballScrapePipeline(
 
     private val scraper = SpojoyBaseballScraper(browserPool)
 
-    override suspend fun getAllFixtureUrls(): List<URI> {
-        logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
-        return scraper.scrapeMatchListPage().parseMlbMatchList()
-    }
-
     override suspend fun getFixtureUrl(league: League.Baseball): List<URI> {
         logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
         return scraper.scrapeMatchListPage().parseMlbMatchList()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<BaseballMatchInfo> = produce {
+    override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<Pair<BaseballMatchInfo, LLMAttachment>> = produce {
         matchUrls.forEach { matchUrl ->
             logger.info("scraping spojoy-baseball-match (url=${matchUrl})")
             val startingPitchersPage: Deferred<StartingPitcerPage> = async { scraper.scrapeStartingPitcherPage(matchUrl) }
@@ -60,6 +57,8 @@ class SpojoyBaseballScrapePipeline(
                 homeTeam = homeTeamName,
                 matchAt = matchPage.await().extractMatchAt(),
                 league = matchPage.await().extractLeague(),
+            )
+            val scrapedResult = BaseballScraped(
                 startingPitcherInfo = startingPitchersPage.await().extractPitcherStats(),
                 batterInfo = buildJsonObject {
                     put(
@@ -72,7 +71,7 @@ class SpojoyBaseballScrapePipeline(
                     )
                 }
             )
-            send(baseballMatchInfo)
+            send(Pair(baseballMatchInfo, scrapedResult))
         }
 
     }

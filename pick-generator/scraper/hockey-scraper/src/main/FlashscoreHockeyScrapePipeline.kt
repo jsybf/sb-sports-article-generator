@@ -4,7 +4,9 @@ import com.microsoft.playwright.PlaywrightException
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.extractors.*
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.HockeyMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.HockeyMatchPage
+import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.HockeyScraped
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
 import kotlinx.coroutines.CoroutineScope
@@ -18,22 +20,16 @@ class FlashscoreHockeyScrapePipeline(
     browserPool: PlaywrightBrowserPool
 ) : ScrapePipeline<HockeyMatchInfo, League.Hockey> {
     private val scraper = FlashscoreHockeyScraper(browserPool)
-    override suspend fun getAllFixtureUrls(): List<URI> =
-        League.Hockey.entries
-            .flatMap { league ->
-                logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
-                scraper.scrapeMatchListPage(league).extractMatchUrls()
-            }
 
     override suspend fun getFixtureUrl(league: League.Hockey): List<URI> {
         logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
         return scraper.scrapeMatchListPage(league).extractMatchUrls()
     }
 
-    override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<HockeyMatchInfo> = produce {
+    override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<Pair<HockeyMatchInfo, LLMAttachment>> = produce {
         for (matchUrl in matchUrls) {
             // 스크래핑시 배당률 관련 버튼들이 아직 존재하지 않으면 playwright가 오류를 뱉음. 이오류는 넘겨야함.
-            val matchInfo: HockeyMatchInfo? = runCatching {
+            runCatching {
                 logger.info("scraping flashscore-hockey-match-page(url={})", matchUrl)
                 val matchPage: Deferred<HockeyMatchPage> = async { scraper.scrapeMatchPage(matchUrl) }
                 val oneXTwoBetOdds = async { scraper.scrapeOneXTwoBetPage(matchUrl).extractOdds() }
@@ -42,20 +38,19 @@ class FlashscoreHockeyScrapePipeline(
                 if (overUnderBetOdds.await().size == 0 || oneXTwoBetOdds.await().size == 0) throw NoSuchElementException("odds doesn't exists")
 
                 val (homeTeam, awayTeam) = matchPage.await().extractTeams()
-                HockeyMatchInfo(
+                val matchInfo = HockeyMatchInfo(
                     awayTeam = awayTeam,
                     homeTeam = homeTeam,
                     matchAt = matchPage.await().extractMatchAt(),
                     league = matchPage.await().extractLeague(),
+                )
+                val scrapdResult = HockeyScraped(
                     matchSummary = matchPage.await().parseMatchSummary(),
                     oneXTwoBet = oneXTwoBetOdds.await(),
                     overUnderBet = overUnderBetOdds.await(),
                 )
-            }
-                .onFailure { exception: Throwable -> if (exception !is PlaywrightException && exception !is NoSuchElementException) throw exception }
-                .getOrNull()
-
-            matchInfo?.let { send(it) }
+                send(Pair(matchInfo, scrapdResult))
+            }.onFailure { exception: Throwable -> if (exception !is PlaywrightException && exception !is NoSuchElementException) throw exception }
         }
     }
 }

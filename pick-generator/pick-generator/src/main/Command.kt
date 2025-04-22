@@ -70,7 +70,7 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
         val scrapeService = ScrapeService(browserPool)
         val claude = AnthropicOkHttpClient.builder().apiKey(claudeApiKey!!).build()
 
-        runBlocking {
+   /*     runBlocking {
             val hockyScrapePipeline = FlashscoreHockeyScrapePipeline(browserPool)
             val urls = hockyScrapePipeline.getAllFixtureUrls()
             with(hockyScrapePipeline) { scrape(urls) }
@@ -91,7 +91,7 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
                 }
                 .collect {}
 
-        }
+        }*/
 
     }
 

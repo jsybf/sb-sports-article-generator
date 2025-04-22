@@ -10,6 +10,4 @@ data class BaseballMatchInfo(
     override val homeTeam: String,
     override val matchAt: LocalDateTime,
     override val league: League.Baseball,
-    val startingPitcherInfo: JsonObject,
-    val batterInfo: JsonObject,
 ) : MatchInfo
