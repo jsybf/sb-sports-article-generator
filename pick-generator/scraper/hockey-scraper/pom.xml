@@ -2,8 +2,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.gitp.sports-article-writer</groupId>
-        <artifactId>sports-article-writer</artifactId>
+        <groupId>io.gitp</groupId>
+        <artifactId>sb-pick-generator</artifactId>
         <version>0.0.1</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>scraper-base</artifactId>
             <version>${project.version}</version>
         </dependency>

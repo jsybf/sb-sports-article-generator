@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.gitp.sports-article-writer</groupId>
-        <artifactId>sports-article-writer</artifactId>
+        <groupId>io.gitp</groupId>
+        <artifactId>sb-pick-generator</artifactId>
         <version>0.0.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -25,32 +25,32 @@
             <version>${dep.version.clikt}</version>
         </dependency>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>scraper-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>baseball-scraper</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>hockey-scraper</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>basketball-scraper</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>database</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.gitp.sports-article-writer</groupId>
+            <groupId>io.gitp</groupId>
             <artifactId>claude</artifactId>
             <version>${project.version}</version>
         </dependency>
