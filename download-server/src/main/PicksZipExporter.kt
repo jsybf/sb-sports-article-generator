@@ -1,17 +1,14 @@
 package io.gitp.downloadserver
 
-import io.gitp.llmarticlewriter.database.SportsRepository
-import io.gitp.llmarticlewriter.database.getSqliteConn
+import io.gitp.sbpick.pickgenerator.database.repositories.PickRepository
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.io.path.Path
-import kotlin.io.path.createTempFile
+import kotlin.io.path.createDirectories
 import kotlin.io.path.writeText
 
 private fun Path.toFis(): FileInputStream = FileInputStream(this.toFile())
@@ -38,46 +35,36 @@ private fun Path.createZipFile(inputFileList: List<Pair<Path, Path>>): Path = Zi
 }
 
 
+private val dateTimeFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH.mm.ss")
+
 /**
- * sqlite에 박혀있는 픽들을 zip파일로  export
+ * db에서 앞으로 있을 경기들의 pick을 zip파일로 저장.
+ * ./<league_name>/<datetime>_<home_team><away_team>.txt 형식으로 zip파일에 저장됨
+ * (example) ./KBO/2025.04.24-18.30.00_삼성_____KIA___.txt
+ * 호출함수가 zip파일을 사용한뒤 지워야한다.
  */
-class PicksZipExporter(
-    private val repo: SportsRepository
-) {
-    companion object {
-        private val dateTimeFormat = DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss")
-    }
+fun exportPicksToZip(pickRepo: PickRepository): Path {
+    val tmpDir: Path = Files.createTempDirectory(null)
 
-    fun exportToTmpZip(zipPath: Path = createTempFile()): Path {
-        val tmpDir: Path = Files.createTempDirectory("picks")
-        val now = LocalDateTime.now()
+    val picks = pickRepo.findFixturesHavingPick()
+    val homeTeamMaxNameLen = picks.map { (match, _) -> match.homeTeam.length }.maxOrNull()!!
+    val awayTeamMaxNameLen = picks.map { (match, _) -> match.awayTeam.length }.maxOrNull()!!
+    val pickFiles = picks
+        .map { (match, pick) ->
+            val pickFileName = "${dateTimeFormat.format(match.matchAt)}_${match.homeTeam.padEnd(homeTeamMaxNameLen, '_')}_${match.awayTeam.padEnd(awayTeamMaxNameLen, '_')}.txt"
+            val pickFile = tmpDir.resolve(match.league.leagueName).resolve(pickFileName)
 
-        val articleFileList: List<Path> = repo
-            .findMatchesHavingArticle()
-            .filter { (matchInfo, _, article) -> now < matchInfo.startAt }
-            .map { (matchInfo, _, article) ->
-                val textFilePath: Path = tmpDir
-                    .resolve(matchInfo.league.leagueName)
-                    .resolve("${dateTimeFormat.format(matchInfo.startAt)}_${matchInfo.homeTeam}_${matchInfo.awayTeam}.txt")
-                    .also { path -> Files.createDirectories(path.parent) }
+            pickFile.parent.createDirectories()
+            pickFile.writeText(pick.content)
 
-                textFilePath.writeText(article.article)
-                textFilePath
-            }
+            pickFile
+        }
 
-        zipPath.createZipFile(
-            articleFileList.map { file -> Pair(file, file.subpath(file.nameCount - 2, file.nameCount)) }
-        )
+    val zipPath: Path = Files.createTempFile(null, null).toAbsolutePath()
+    zipPath.createZipFile(
+        pickFiles.map { file -> Pair(file, file.subpath(file.nameCount - 2, file.nameCount)) }
+    )
 
-        return zipPath
-    }
-}
-
-
-fun main() {
-    val service = getSqliteConn(Path("./test-data/sqlite.db"))
-        .let { conn -> SportsRepository(conn) }
-        .let { repo -> PicksZipExporter(repo) }
-
-    service.exportToTmpZip()
+    tmpDir.toFile().deleteRecursively()
+    return zipPath
 }

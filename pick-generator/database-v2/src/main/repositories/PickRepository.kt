@@ -10,6 +10,7 @@ import io.gitp.sbpick.pickgenerator.database.models.toSportsMatchDto
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDateTime
 
 
 class PickRepository(
@@ -24,18 +25,14 @@ class PickRepository(
         }.value
     }
 
-    fun findMatchesHavingPick(): List<Pair<SportsMatchDto, PickDto>> = transaction(db) {
+    fun findFixturesHavingPick(): List<Pair<SportsMatchDto, PickDto>> = transaction(db) {
         val query = SportsMatchTbl
             .innerJoin(PickTbl)
             .select(SportsMatchEntity.dependsOnColumns)
+            .where { SportsMatchTbl.matchAt greaterEq LocalDateTime.now() }
 
         SportsMatchEntity
             .wrapRows(query)
-            .map { sportsMatchEntity ->
-                Pair(
-                    sportsMatchEntity.toSportsMatchDto(),
-                    sportsMatchEntity.pick!!.toPickDto()
-                )
-            }
+            .map { sportsMatchEntity -> Pair(sportsMatchEntity.toSportsMatchDto(), sportsMatchEntity.pick!!.toPickDto()) }
     }
 }

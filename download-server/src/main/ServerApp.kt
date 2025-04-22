@@ -1,18 +1,30 @@
 package io.gitp.downloadserver
 
-import io.gitp.llmarticlewriter.database.SportsRepository
-import io.gitp.llmarticlewriter.database.getSqliteConn
+import io.gitp.sbpick.pickgenerator.database.repositories.PickRepository
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import java.nio.file.Path
+import org.jetbrains.exposed.sql.Database
 
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
+
 fun Application.routeModule() {
-    val sqlitePath = environment.config.propertyOrNull("sqlite.path")?.getString().let { Path.of(it) } ?: throw Exception("specify sqlite.path in application.conf")
-    val zipExporter = PicksZipExporter(SportsRepository(getSqliteConn(sqlitePath)))
+    val mysqlHost = environment.config.property("mysql.host").getString()
+    val mysqlPort = environment.config.property("mysql.port").getString()
+    val mysqlDatabase = environment.config.property("mysql.db").getString()
+    val mysqlUser = environment.config.property("mysql.user").getString()
+    val mysqlPassword = environment.config.property("mysql.pw").getString()
+
+    val db = Database.connect(
+        url = "jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDatabase}",
+        user = mysqlUser,
+        password = mysqlPassword
+    )
+
+    val pickRepo = PickRepository(db)
+
     routing {
-        downloadRoute(zipExporter)
+        downloadRoute(pickRepo)
     }
 }
