@@ -16,15 +16,10 @@
         <module>pick-generator/scraper/hockey-scraper</module>
         <module>pick-generator/scraper/baseball-scraper</module>
         <module>pick-generator/scraper/basketball-scraper</module>
-        <module>pick-generator/database-v2</module>
+        <module>pick-generator/database</module>
         <module>pick-generator/claude</module>
-        <module>pick-generator/pick-generator</module>
+        <module>pick-generator/cli</module>
         <module>download-server</module>
-        <module>llm-article-writer/scraper</module>
-        <module>llm-article-writer/spojoy-scraper</module>
-        <module>llm-article-writer/cli</module>
-        <module>llm-article-writer/llm-writer</module>
-        <module>llm-article-writer/database</module>
     </modules>
 
     <properties>
@@ -50,6 +45,7 @@
         <dep.version.kotlinx-coroutine>1.10.2</dep.version.kotlinx-coroutine>
         <dep.version.mysql-jdbc>9.2.0</dep.version.mysql-jdbc>
         <dep.version.antropic>1.1.0</dep.version.antropic>
+        <dep.version.clikt>5.0.1</dep.version.clikt>
 
 
     </properties>

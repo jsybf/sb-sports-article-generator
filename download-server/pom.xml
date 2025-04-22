@@ -20,8 +20,8 @@
     <dependencies>
         <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
-            <artifactId>database-v2</artifactId>
-            <version>0.0.1</version>
+            <artifactId>database</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.exposed</groupId>

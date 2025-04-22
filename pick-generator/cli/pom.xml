@@ -9,7 +9,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>pick-generator</artifactId>
+    <artifactId>cli</artifactId>
     <packaging>jar</packaging>
 
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>com.github.ajalt.clikt</groupId>
             <artifactId>clikt-jvm</artifactId>
-            <version>5.0.1</version>
+            <version>${dep.version.clikt}</version>
         </dependency>
         <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
-            <artifactId>database-v2</artifactId>
+            <artifactId>database</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
