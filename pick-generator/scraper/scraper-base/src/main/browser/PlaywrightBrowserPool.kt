@@ -1,6 +1,7 @@
 package io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser
 
 import com.microsoft.playwright.Page
+import com.microsoft.playwright.TimeoutError
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -23,12 +24,24 @@ class PlaywrightBrowserPool(
         }
     }
 
+    private suspend fun scrapeRetry(retry: Int, block: suspend () -> Document): Document {
+        for (tryCnt in 1..retry) {
+            val result: Result<Document> = runCatching { block() }
+            result.onSuccess { return it }
+            result.onFailure { exception: Throwable ->
+                if (exception !is TimeoutError) throw exception
+                logger.warn("got ${exception} try_cnt:${tryCnt}")
+            }
+        }
+        throw Exception("exceed max retry")
+    }
+
     suspend fun doAndGetDoc(action: suspend Page.() -> Unit): Document {
         semaphore.acquire()
         val worker = workerChannel.receive()
         try {
             logger.trace("executing doAndGetDoc")
-            return worker.doAndGetDoc(action)
+            return scrapeRetry(2) { worker.doAndGetDoc(action) }
         } finally {
             workerChannel.send(worker)
             semaphore.release()

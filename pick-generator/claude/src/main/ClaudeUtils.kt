@@ -34,7 +34,7 @@ suspend fun AnthropicClient.requestAsync(
             inputTokens = resp.usage().inputTokens().toUInt(),
             outputTokens = resp.usage().outputTokens().toUInt(),
             message = resp.content().map { it.text().getOrNull()!!.text() }.joinToString("\n")
-        ).also { logger.info("inputTokens:{} outputTokens:{} cachedPromptTokens", it.inputTokens, it.outputTokens, resp.usage().cacheReadInputTokens()) }
+        ).also { logger.info("inputTokens:{} outputTokens:{} cachedPromptTokens: {}", it.inputTokens, it.outputTokens, resp.usage().cacheReadInputTokens()) }
     }
 }
 
@@ -63,7 +63,7 @@ internal inline fun <reified T> claudeRetry(retry: Int, sleepTime: Duration = 30
         result.onFailure { exception: Throwable ->
             if (exception !is RateLimitException && exception !is SseException) throw exception
             logger.warn("got ${exception} gonna sleep ${sleepTime}sec")
-            Thread.sleep(sleepTime)
+            Thread.sleep(sleepTime) // delay를 써야하지만... 스크래핑 -> llm 쿼리 에서 후자가 병목점임으로 그냥 Thread.sleep
         }
     }
     throw Exception("exceed max retry")
