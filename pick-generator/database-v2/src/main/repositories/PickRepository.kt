@@ -15,12 +15,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 class PickRepository(
     private val db: Database
 ) {
-    fun insertAndGetId(matchId: UInt, pick: PickDto): UInt = transaction(db) {
+    fun insertAndGetId(matchId: UInt, content: String, inputTokens: UInt, outputTokens: UInt): UInt = transaction(db) {
         PickTbl.insertAndGetId {
             it[sportsMatchId] = matchId
-            it[content] = pick.content
-            it[inputTokens] = pick.inputTokens
-            it[outputTokens] = pick.outputTokens
+            it[PickTbl.content] = content
+            it[PickTbl.inputTokens] = inputTokens
+            it[PickTbl.outputTokens] = outputTokens
         }.value
     }
 

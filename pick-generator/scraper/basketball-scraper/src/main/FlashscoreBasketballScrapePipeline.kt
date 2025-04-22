@@ -15,19 +15,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
-import java.net.URI
 
 class FlashscoreBasketballScrapePipeline(
     browserPool: PlaywrightBrowserPool
 ) : ScrapePipeline<BasketballMatchInfo, League.Basketball> {
     private val scraper = FlashscoreBasketballScraper(browserPool)
-    override suspend fun getFixtureUrl(league: League.Basketball): List<URI> {
+    override suspend fun getFixtureUrl(league: League.Basketball): List<String> {
         logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
         return scraper.scrapeMatchListPage(league).extractMatchUrls()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<Pair<BasketballMatchInfo, LLMAttachment>> = produce {
+    override fun CoroutineScope.scrape(matchUrls: List<String>): ReceiveChannel<Pair<BasketballMatchInfo, LLMAttachment>> = produce {
         for (matchUrl in matchUrls) {
             // 스크래핑시 배당률 관련 버튼들이 아직 존재하지 않으면 playwright가 오류를 뱉음. 이오류는 넘겨야함.
             runCatching {
@@ -44,6 +43,7 @@ class FlashscoreBasketballScrapePipeline(
                     homeTeam = homeTeam,
                     matchAt = matchPage.await().extractMatchAt(),
                     league = matchPage.await().extractLeague(),
+                    matchUniqueUrl = matchUrl
                 )
                 val scrapedResult = BasketballScraped(
                     matchSummary = matchPage.await().extractMatchSummary(),

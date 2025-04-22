@@ -28,13 +28,13 @@ data class SportsMatchDto(
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun fromMatchInfo(matchInfo: MatchInfo): SportsMatchDto = SportsMatchDto(
+        fun from(matchInfo: MatchInfo): SportsMatchDto = SportsMatchDto(
             id = null,
             league = matchInfo.league,
             homeTeam = matchInfo.homeTeam,
             awayTeam = matchInfo.awayTeam,
             matchAt = matchInfo.matchAt,
-            matchUniqueUrl = "",
+            matchUniqueUrl = matchInfo.matchUniqueUrl,
             updatedAt = null
         )
     }

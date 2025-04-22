@@ -13,7 +13,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
-import java.net.URI
 
 class SpojoyBaseballScrapePipeline(
     browserPool: PlaywrightBrowserPool
@@ -21,13 +20,13 @@ class SpojoyBaseballScrapePipeline(
 
     private val scraper = SpojoyBaseballScraper(browserPool)
 
-    override suspend fun getFixtureUrl(league: League.Baseball): List<URI> {
+    override suspend fun getFixtureUrl(league: League.Baseball): List<String> {
         logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
         return scraper.scrapeMatchListPage().parseMlbMatchList()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<Pair<BaseballMatchInfo, LLMAttachment>> = produce {
+    override fun CoroutineScope.scrape(matchUrls: List<String>): ReceiveChannel<Pair<BaseballMatchInfo, LLMAttachment>> = produce {
         matchUrls.forEach { matchUrl ->
             logger.info("scraping spojoy-baseball-match (url=${matchUrl})")
             val startingPitchersPage: Deferred<StartingPitcerPage> = async { scraper.scrapeStartingPitcherPage(matchUrl) }
@@ -57,6 +56,7 @@ class SpojoyBaseballScrapePipeline(
                 homeTeam = homeTeamName,
                 matchAt = matchPage.await().extractMatchAt(),
                 league = matchPage.await().extractLeague(),
+                matchUniqueUrl = matchUrl
             )
             val scrapedResult = BaseballScraped(
                 startingPitcherInfo = startingPitchersPage.await().extractPitcherStats(),

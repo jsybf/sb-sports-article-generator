@@ -19,8 +19,7 @@ internal fun StreamResponse<RawMessageStreamEvent>.handleStream(): ClaudeResp {
                 model = event.asStart().message().model().asString()
             }
             event.isContentBlockDelta() ->
-                event.asContentBlockDelta().delta().text().getOrNull()!!.text()
-                    .also { responseBuilder.append(it) }
+                event.asContentBlockDelta().delta().text().getOrNull()!!.text().also { responseBuilder.append(it) }
             event.isDelta() ->
                 outputToken = event.asDelta().usage().outputTokens()
         }

@@ -4,7 +4,6 @@ import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.*
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import java.net.URI
 
 
 internal class SpojoyBaseballScraper(
@@ -21,30 +20,30 @@ internal class SpojoyBaseballScraper(
             .let { BaseballMatchListPage(it) }
     }
 
-    suspend fun scrapeMatchPage(matchPageUrl: URI): BaseballMatchPage {
+    suspend fun scrapeMatchPage(matchPageUrl: String): BaseballMatchPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping spojoy-baseball-match-page (matchPageUrl=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
             }
             .await()
             .let { BaseballMatchPage(it) }
     }
 
-    suspend fun scrapeStartingPitcherPage(matchPageUrl: URI): StartingPitcerPage {
+    suspend fun scrapeStartingPitcherPage(matchPageUrl: String): StartingPitcerPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping spojoy-baseball-staring-pitcher-page (matchPageUrl=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
             }
             .await()
             .let { StartingPitcerPage(it) }
     }
 
-    suspend fun scrapePlayerListPage(matchPageUrl: URI): Pair<BaseballPlayerListPage, BaseballPlayerListPage> = coroutineScope {
+    suspend fun scrapePlayerListPage(matchPageUrl: String): Pair<BaseballPlayerListPage, BaseballPlayerListPage> = coroutineScope {
         val baseballMatchPage = this@SpojoyBaseballScraper.browserPool.doAndGetDocAsync {
             logger.debug("scraping spojoy-baseball-player-list-page (matchPageUrl=${matchPageUrl})")
-            navigate(matchPageUrl.toString())
+            navigate(matchPageUrl)
         }
 
         val (homePlayerListPageUrl, awayPlayerListPageUrl) = baseballMatchPage.await()
@@ -77,11 +76,11 @@ internal class SpojoyBaseballScraper(
         Pair(homePlayerListPage.await(), awayPlayerListPage.await())
     }
 
-    suspend fun scrapePlayerPage(playerPageUrl: URI): BaseballPlayerPage {
+    suspend fun scrapePlayerPage(playerPageUrl: String): BaseballPlayerPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("requesting to spojoy-baseball-player-page ${playerPageUrl}")
-                navigate(playerPageUrl.toString())
+                navigate(playerPageUrl)
             }
             .await()
             .let { BaseballPlayerPage(it) }

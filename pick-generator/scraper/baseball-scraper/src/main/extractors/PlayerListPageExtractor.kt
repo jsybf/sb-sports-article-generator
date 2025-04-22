@@ -1,10 +1,9 @@
 package io.gitp.sbpick.pickgenerator.scraper.baseballscraper.extractors
 
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballPlayerListPage
-import java.net.URI
 
 private val extractPlayerCode = Regex("""[0-9]+""")
-internal fun BaseballPlayerListPage.extractPlayerPageUrl(): List<URI> {
+internal fun BaseballPlayerListPage.extractPlayerPageUrl(): List<String> {
     return this.doc
         .select("""tr[height="50"]""")
         .asIterable()
@@ -16,5 +15,4 @@ internal fun BaseballPlayerListPage.extractPlayerPageUrl(): List<URI> {
                 .let { playerCode -> "https://www.spojoy.com/sportsinfo/infomation/club/player_info.spo?player_code=${playerCode}" }
         }
         .distinct()
-        .map { URI(it) }
 }

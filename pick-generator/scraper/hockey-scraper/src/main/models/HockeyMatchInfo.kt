@@ -9,5 +9,6 @@ data class HockeyMatchInfo(
     override val homeTeam: String,
     override val matchAt: LocalDateTime,
     override val league: League.Hockey,
+    override val matchUniqueUrl: String
 ) : MatchInfo
 

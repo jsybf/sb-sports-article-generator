@@ -7,7 +7,6 @@ import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.OneXTwoBetPage
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.OverUnderBetPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
-import java.net.URI
 
 internal class FlashscoreHockeyScraper(
     private val browserPool: PlaywrightBrowserPool
@@ -23,22 +22,22 @@ internal class FlashscoreHockeyScraper(
     }
 
 
-    suspend fun scrapeMatchPage(matchPageUrl: URI): HockeyMatchPage {
+    suspend fun scrapeMatchPage(matchPageUrl: String): HockeyMatchPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping flashscore-hockey-match-page(url=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
             }
             .await()
             .let { HockeyMatchPage(it) }
     }
 
 
-    suspend fun scrapeOneXTwoBetPage(matchPageUrl: URI): OneXTwoBetPage {
+    suspend fun scrapeOneXTwoBetPage(matchPageUrl: String): OneXTwoBetPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping flashscore-hockey-1x2bet-page (matchPageUrl=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
                 locator(".detailOver a:nth-child(2)").click()
                 locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(1)").click()
                 assertThat(locator("#detail")).isVisible()
@@ -47,11 +46,11 @@ internal class FlashscoreHockeyScraper(
             .let { OneXTwoBetPage(it) }
     }
 
-    suspend fun scrapeOverUnderBetPage(matchPageUrl: URI): OverUnderBetPage {
+    suspend fun scrapeOverUnderBetPage(matchPageUrl: String): OverUnderBetPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping flashscore-hockey-over-under-bet-page (matchPageUrl=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
                 locator(".detailOver a:nth-child(2)").click()
                 locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(3)").click()
                 assertThat(locator("#detail")).isVisible()

@@ -7,7 +7,6 @@ import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.models.OneXTwoBetP
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.models.OverUnderBetPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
-import java.net.URI
 
 internal class FlashscoreBasketballScraper(
     private val browserPool: PlaywrightBrowserPool
@@ -23,22 +22,22 @@ internal class FlashscoreBasketballScraper(
     }
 
 
-    suspend fun scrapeMatchPage(matchPageUrl: URI): BasketballMatchPage {
+    suspend fun scrapeMatchPage(matchPageUrl: String): BasketballMatchPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping flashscore-hockey-match-page(url=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
             }
             .await()
             .let { BasketballMatchPage(it) }
     }
 
 
-    suspend fun scrapeOneXTwoBetPage(matchPageUrl: URI): OneXTwoBetPage {
+    suspend fun scrapeOneXTwoBetPage(matchPageUrl: String): OneXTwoBetPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping flashscore-hockey-1x2bet-page (matchPageUrl=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
                 locator(".detailOver a:nth-child(2)").click()
                 locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(1)").click()
                 assertThat(locator("#detail")).isVisible()
@@ -47,11 +46,11 @@ internal class FlashscoreBasketballScraper(
             .let { OneXTwoBetPage(it) }
     }
 
-    suspend fun scrapeOverUnderBetPage(matchPageUrl: URI): OverUnderBetPage {
+    suspend fun scrapeOverUnderBetPage(matchPageUrl: String): OverUnderBetPage {
         return this.browserPool
             .doAndGetDocAsync {
                 logger.debug("scraping flashscore-hockey-over-under-bet-page (matchPageUrl=${matchPageUrl})")
-                navigate(matchPageUrl.toString())
+                navigate(matchPageUrl)
                 locator(".detailOver a:nth-child(2)").click()
                 locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(3)").click()
                 assertThat(locator("#detail")).isVisible()
