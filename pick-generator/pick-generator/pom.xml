@@ -15,6 +15,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.ajalt.clikt</groupId>
+            <artifactId>clikt-jvm</artifactId>
+            <version>5.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.gitp.sports-article-writer</groupId>
+            <artifactId>scraper-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.gitp.sports-article-writer</groupId>
             <artifactId>baseball-scraper</artifactId>
             <version>${project.version}</version>

@@ -1,5 +1,6 @@
 package io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models
 
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
 import kotlinx.serialization.json.JsonArray
@@ -14,4 +15,18 @@ data class HockeyMatchInfo(
     val matchSummary: JsonObject,
     val oneXTwoBet: JsonArray,
     val overUnderBet: JsonArray,
-) : MatchInfo
+) : MatchInfo, LLMAttachment {
+
+    override fun toLLMAttachment(): String = """
+        <matchSummary>
+        ${this.matchSummary}
+        </matchSummary>
+        <winOrLooseBetCurrent>
+        ${this.oneXTwoBet}
+        </winOrLooseBetCurrent>
+        <totalScoreBetCurrent>
+        ${this.overUnderBet}
+        </totalScoreBetCurrent>
+    """.trimIndent()
+
+}

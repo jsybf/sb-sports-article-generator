@@ -2,10 +2,6 @@ package io.gitp.sbpick.pickgenerator.scraper.basketballscraper
 
 import com.microsoft.playwright.PlaywrightException
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.*
-import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractLeague
-import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractMatchAt
-import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractMatchSummary
-import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractTeams
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.models.BasketballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.models.BasketballMatchPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
@@ -21,11 +17,16 @@ import java.net.URI
 
 class FlashscoreBasketballScrapePipeline(
     browserPool: PlaywrightBrowserPool
-) : ScrapePipeline<BasketballMatchInfo> {
+) : ScrapePipeline<BasketballMatchInfo, League.Basketball> {
     private val scraper = FlashscoreBasketballScraper(browserPool)
-    override suspend fun getFixtureUrl(): List<URI> = League.Basketball.entries.flatMap { league ->
+    override suspend fun getAllFixtureUrls(): List<URI> = League.Basketball.entries.flatMap { league ->
         logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
         scraper.scrapeMatchListPage(league).extractMatchUrls()
+    }
+
+    override suspend fun getFixtureUrl(league: League.Basketball): List<URI> {
+        logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
+        return scraper.scrapeMatchListPage(league).extractMatchUrls()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

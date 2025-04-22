@@ -8,7 +8,7 @@ sealed interface League {
 
 
     companion object {
-        private val allEntries: List<League> = League::class.sealedSubclasses.flatMap { subclass -> subclass.java.enumConstants.toList() }.map { it as League }
+        val allEntries: List<League> = League::class.sealedSubclasses.flatMap { subclass -> subclass.java.enumConstants.toList() }.map { it as League }
 
 
         fun findByName(sportsName: String, leagueName: String): League? {

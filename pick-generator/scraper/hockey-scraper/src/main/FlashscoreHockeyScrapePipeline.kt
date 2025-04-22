@@ -16,14 +16,19 @@ import java.net.URI
 
 class FlashscoreHockeyScrapePipeline(
     browserPool: PlaywrightBrowserPool
-) : ScrapePipeline<HockeyMatchInfo> {
+) : ScrapePipeline<HockeyMatchInfo, League.Hockey> {
     private val scraper = FlashscoreHockeyScraper(browserPool)
-    override suspend fun getFixtureUrl(): List<URI> =
+    override suspend fun getAllFixtureUrls(): List<URI> =
         League.Hockey.entries
             .flatMap { league ->
                 logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
                 scraper.scrapeMatchListPage(league).extractMatchUrls()
             }
+
+    override suspend fun getFixtureUrl(league: League.Hockey): List<URI> {
+        logger.info("scraping flashscore-hockey-match-list-page(url={})", league.matchListPageUrl)
+        return scraper.scrapeMatchListPage(league).extractMatchUrls()
+    }
 
     override fun CoroutineScope.scrape(matchUrls: List<URI>): ReceiveChannel<HockeyMatchInfo> = produce {
         for (matchUrl in matchUrls) {

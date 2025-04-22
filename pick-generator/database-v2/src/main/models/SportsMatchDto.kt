@@ -2,6 +2,7 @@ package io.gitp.sbpick.pickgenerator.database.models
 
 import io.gitp.sbpick.pickgenerator.database.SportsMatchEntity
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
 import java.time.LocalDateTime
 
 internal fun SportsMatchEntity.toSportsMatchDto(): SportsMatchDto {
@@ -24,7 +25,19 @@ data class SportsMatchDto(
     val awayTeam: String,
     val matchAt: LocalDateTime,
     val matchUniqueUrl: String,
-    val updatedAt: LocalDateTime
-)
+    val updatedAt: LocalDateTime?
+) {
+    companion object {
+        fun fromMatchInfo(matchInfo: MatchInfo): SportsMatchDto = SportsMatchDto(
+            id = null,
+            league = matchInfo.league,
+            homeTeam = matchInfo.homeTeam,
+            awayTeam = matchInfo.awayTeam,
+            matchAt = matchInfo.matchAt,
+            matchUniqueUrl = "",
+            updatedAt = null
+        )
+    }
+}
 
 

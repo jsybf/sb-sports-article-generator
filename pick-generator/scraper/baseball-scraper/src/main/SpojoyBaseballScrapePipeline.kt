@@ -4,6 +4,7 @@ import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.extractors.*
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.StartingPitcerPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -14,11 +15,16 @@ import java.net.URI
 
 class SpojoyBaseballScrapePipeline(
     browserPool: PlaywrightBrowserPool
-) : ScrapePipeline<BaseballMatchInfo> {
+) : ScrapePipeline<BaseballMatchInfo, League.Baseball> {
 
     private val scraper = SpojoyBaseballScraper(browserPool)
 
-    override suspend fun getFixtureUrl(): List<URI> {
+    override suspend fun getAllFixtureUrls(): List<URI> {
+        logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
+        return scraper.scrapeMatchListPage().parseMlbMatchList()
+    }
+
+    override suspend fun getFixtureUrl(league: League.Baseball): List<URI> {
         logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
         return scraper.scrapeMatchListPage().parseMlbMatchList()
     }
