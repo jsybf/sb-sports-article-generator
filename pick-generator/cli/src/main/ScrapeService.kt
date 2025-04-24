@@ -12,68 +12,108 @@ import io.gitp.sbpick.pickgenerator.database.repositories.SportsMatchRepository
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.SpojoyBaseballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.FlashscoreBasketballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.FlashscoreHockeyScrapePipeline
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.coroutineScope
-import java.time.Duration
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
-internal class ScraperPipelineContainer(
-    private val browserPool: PlaywrightBrowserPool
-) {
-    private val basketballScrapePipeline = FlashscoreBasketballScrapePipeline(browserPool)
-    private val hockeyScrapePipeline = FlashscoreHockeyScrapePipeline(browserPool)
-    private val baseballScrapePipeline = SpojoyBaseballScrapePipeline(browserPool)
+// TODO: enum에 파일 프로퍼티를 추가하든 해야할 듯. 매호출마다 파일을 다시 읽어드림...
+private fun readResourceFile(path: String): String = object {}::class.java.getResource(path)?.readText() ?: throw Exception("can't find ${path} in resource")
 
-    fun getByLeague(league: League): ScrapePipeline<out MatchInfo, out League> = when (league) {
-        is League.Basketball -> this.basketballScrapePipeline
-        is League.Hockey -> this.hockeyScrapePipeline
-        is League.Baseball -> this.baseballScrapePipeline
+private object ScraperModuleContainer {
+    data class ScraperModule(
+        val prompt: String,
+        val scrapePipline: ScrapePipeline<League>
+    )
+
+    private val hockeyModule = ScraperModule(readResourceFile("/hockey-prompt.txt"), FlashscoreHockeyScrapePipeline)
+    private val baseketballModule = ScraperModule(readResourceFile("/basketball-prompt.txt"), FlashscoreBasketballScrapePipeline)
+    private val baseballModule = ScraperModule(readResourceFile("/baseball-prompt.txt"), SpojoyBaseballScrapePipeline)
+
+    fun findByLeague(league: League): ScraperModule = when (league) {
+        is League.Hockey -> hockeyModule
+        is League.Baseball -> baseballModule
+        is League.Basketball -> baseketballModule
     }
 }
 
-// TODO: enum에 파일 프로퍼티를 추가하든 해야할 듯. 매호출마다 파일을 다시 읽어드림...
-internal fun readResourceFile(path: String): String = object {}::class.java.getResource(path)?.readText() ?: throw Exception("can't find ${path} in resource")
+internal fun PlaywrightBrowserPool.scrape(
+    league: League,
+    filteringUrls: Set<String>
+): Flow<Result<Pair<MatchInfo, LLMAttachment>>> = flow {
+    val (_, scraperPipeline) = ScraperModuleContainer.findByLeague(league)
 
-internal fun getPromptByLeague(league: League): String = when (league) {
-    is League.Basketball -> readResourceFile("/basketball-prompt.txt")
-    is League.Hockey -> readResourceFile("/hockey-prompt.txt")
-    is League.Baseball -> readResourceFile("/baseball-prompt.txt")
+    val matchUrls = scraperPipeline.scrapeFixtureUrls(this@scrape, league).subtract(filteringUrls)
+
+    for (matchUrl in matchUrls) {
+        emit(scraperPipeline.scrapeMatch(this@scrape, league, matchUrl))
+    }
 }
 
-internal suspend fun scrapeAndGeneratePick(
+internal suspend fun AnthropicClient.generatePick(
+    scrapedResult: LLMAttachment,
+    prompt: String,
+    maxRetry: Int = 2,
+    duration: Duration = 60.seconds,
+): ClaudeResp {
+    val generatedPick: ClaudeResp = this.requestAsync(maxRetry, duration) {
+        model(Model.CLAUDE_3_7_SONNET_20250219)
+        maxTokens(4000L)
+        systemOfTextBlockParams(
+            listOf(
+                TextBlockParam.builder()
+                    .text(prompt)
+                    .cacheControl(CacheControlEphemeral.builder().build())
+                    .build()
+            )
+        )
+        addUserMessage(scrapedResult.toLLMAttachment())
+    }
+    logger.info("inputTokens:{} outputTokens:{}", generatedPick.inputTokens, generatedPick.outputTokens)
+    return generatedPick
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+internal suspend fun scrapeGeneratePersistPick(
+    leagues: Set<League>,
+    filteringUrls: Set<String>,
+    browserPool: PlaywrightBrowserPool,
     claudeClient: AnthropicClient,
     sportsMatchRepo: SportsMatchRepository,
     pickRepo: PickRepository,
-    scrapePipelineContainer: ScraperPipelineContainer,
-    leagues: Set<League>,
-    filteringUrls: Set<String>
-) = coroutineScope {
-    for (league in leagues) {
-        val scrapePipeline = scrapePipelineContainer.getByLeague(league) // 1. league로 ScrapePipelineContainer가져오기
-        val matchUrls = scrapePipeline.getFixtureUrl(league).subtract(filteringUrls) // 2. match page url들 가져오기.(이미 디비에 저장된 데이터의 중복을 피하기 위해 filteringUrls 를 제외하고)
-        with(scrapePipeline) { scrape(matchUrls.toList()) }
-            .consumeEach { (matchInfo: MatchInfo, scrapeResult: LLMAttachment) ->
-                val generatedPick: ClaudeResp = claudeClient.requestAsync(2, Duration.ofSeconds(60)) { // 3. pick 글 생성
-                    model(Model.CLAUDE_3_7_SONNET_20250219)
-                    maxTokens(4000L)
-                    systemOfTextBlockParams(
-                        listOf(
-                            TextBlockParam.builder()
-                                .text(getPromptByLeague(league))
-                                .cacheControl(CacheControlEphemeral.builder().build())
-                                .build()
-                        )
-                    )
-                    addUserMessage(scrapeResult.toLLMAttachment())
+    maxRetry: Int = 2,
+    duration: Duration = 60.seconds,
+) {
+    leagues
+        .asFlow()
+        .map { league -> browserPool.scrape(league, filteringUrls) }
+        .flattenConcat()
+        .map { scrapeResult: Result<Pair<MatchInfo, LLMAttachment>> ->
+            val (matchInfo, scrapedResult) = scrapeResult.getOrElse { exception ->
+                when (exception) {
+                    is RequiredPageNotFound -> {
+                        logger.warn(exception.message)
+                        return@map null
+                    }
+                    else -> throw exception
                 }
-                val matchId = sportsMatchRepo.insertMatchAndGetId(SportsMatchDto.from(matchInfo)) // 4. db에 경기정보와 pick 글 저장
-                pickRepo.insertAndGetId(matchId, generatedPick.message, generatedPick.inputTokens, generatedPick.outputTokens)
             }
-    }
+            val pickResp: ClaudeResp = withContext(Dispatchers.IO) {
+                claudeClient.generatePick(scrapedResult, ScraperModuleContainer.findByLeague(matchInfo.league).prompt)
+            }
+            Pair(matchInfo, pickResp)
+        }
+        .filterNotNull()
+        .collect { (matchInfo: MatchInfo, pickResp: ClaudeResp) ->
+            val matchId = sportsMatchRepo.insertMatchAndGetId(SportsMatchDto.from(matchInfo))
+            pickRepo.insertAndGetId(matchId, pickResp.message, pickResp.inputTokens, pickResp.outputTokens)
+        }
 }
-
-

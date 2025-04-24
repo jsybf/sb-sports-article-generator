@@ -9,15 +9,15 @@ import com.anthropic.models.messages.MessageCreateParams
 import com.anthropic.models.messages.RawMessageStreamEvent
 import io.gitp.pickgenerator.claude.models.ClaudeResp
 import kotlinx.coroutines.future.asDeferred
-import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import kotlin.jvm.optionals.getOrNull
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 suspend fun AnthropicClient.requestAsync(
     retry: Int = 3,
-    sleepTime: Duration = 30.seconds.toJavaDuration(),
+    sleepTime: Duration = 30.seconds,
     paramBuildBlock: MessageCreateParams.Builder.() -> Unit
 ): ClaudeResp {
     val param = MessageCreateParams.builder()
@@ -28,19 +28,17 @@ suspend fun AnthropicClient.requestAsync(
         val respFuture: CompletableFuture<Message> = this.async().messages().create(param)
         val resp = respFuture.asDeferred().await()
 
-
-
         ClaudeResp(
             inputTokens = resp.usage().inputTokens().toUInt(),
             outputTokens = resp.usage().outputTokens().toUInt(),
             message = resp.content().map { it.text().getOrNull()!!.text() }.joinToString("\n")
-        ).also { logger.info("inputTokens:{} outputTokens:{} cachedPromptTokens: {}", it.inputTokens, it.outputTokens, resp.usage().cacheReadInputTokens()) }
+        )
     }
 }
 
 fun AnthropicClient.requestStreaming(
     retry: Int = 3,
-    sleepTime: Duration = 30.seconds.toJavaDuration(),
+    sleepTime: Duration = 30.seconds,
     paramBuildBlock: MessageCreateParams.Builder.() -> Unit
 ): ClaudeResp {
     val param = MessageCreateParams.builder()
@@ -56,14 +54,14 @@ fun AnthropicClient.requestStreaming(
     }
 }
 
-internal inline fun <reified T> claudeRetry(retry: Int, sleepTime: Duration = 30.seconds.toJavaDuration(), block: () -> T): T {
+internal inline fun <reified T> claudeRetry(retry: Int, sleepTime: Duration = 30.seconds, block: () -> T): T {
     for (tryCnt in 1..retry) {
         val result = runCatching { block() }
         result.onSuccess { return it }
         result.onFailure { exception: Throwable ->
             if (exception !is RateLimitException && exception !is SseException) throw exception
             logger.warn("got ${exception} gonna sleep ${sleepTime}sec")
-            Thread.sleep(sleepTime) // delay를 써야하지만... 스크래핑 -> llm 쿼리 에서 후자가 병목점임으로 그냥 Thread.sleep
+            Thread.sleep(sleepTime.toJavaDuration()) // delay를 써야하지만... 스크래핑 -> llm 쿼리 에서 후자가 병목점임으로 그냥 Thread.sleep
         }
     }
     throw Exception("exceed max retry")

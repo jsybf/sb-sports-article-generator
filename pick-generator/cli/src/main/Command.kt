@@ -58,13 +58,13 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
         val existingMatchUrls = sportsMatchRepo.findFixtures().map { it.matchUniqueUrl }.toSet()
 
         runBlocking {
-            scrapeAndGeneratePick(
+            scrapeGeneratePersistPick(
+                leagues = leagues,
+                filteringUrls = existingMatchUrls,
+                browserPool = browserPool,
                 claudeClient = claudeClient,
                 sportsMatchRepo = sportsMatchRepo,
                 pickRepo = pickRepo,
-                scrapePipelineContainer = ScraperPipelineContainer(browserPool),
-                leagues = leagues,
-                filteringUrls = existingMatchUrls
             )
         }
     }

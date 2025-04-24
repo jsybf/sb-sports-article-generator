@@ -9,7 +9,7 @@ import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballMatch
  */
 private val extractMatchIdFromHref = Regex("""[0-9]+""")
 
-internal fun BaseballMatchListPage.parseMlbMatchList(): List<String> {
+internal fun BaseballMatchListPage.extractMlbMatchList(): List<String> {
     val aElements = this.doc.select("#ScheduleBox td #spodb_ a")
     return aElements
         .filter { aElement -> aElement.text() == "비교분석" }

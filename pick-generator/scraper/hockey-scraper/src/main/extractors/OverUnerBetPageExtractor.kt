@@ -3,7 +3,7 @@ package io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.extractors
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.OverUnderBetPage
 import kotlinx.serialization.json.*
 
-internal fun OverUnderBetPage.extactOdds() = buildJsonArray {
+internal fun OverUnderBetPage.extractOdds() = buildJsonArray {
     val tables = doc.select(".ui-table.oddsCell__odds")
     for (table in tables) {
         // 각 테이블에서 총점 추출
