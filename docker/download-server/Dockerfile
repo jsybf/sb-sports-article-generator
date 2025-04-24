@@ -3,11 +3,14 @@ FROM maven:3.9-eclipse-temurin-21 AS dependencies
 
 WORKDIR /opt/app
 
+COPY pick-generator/scraper/scraper-base/pom.xml pick-generator/scraper/scraper-base/pom.xml
+COPY pick-generator/scraper/baseball-scraper/pom.xml pick-generator/scraper/baseball-scraper/pom.xml
+COPY pick-generator/scraper/basketball-scraper/pom.xml pick-generator/scraper/basketball-scraper/pom.xml
+COPY pick-generator/scraper/hockey-scraper/pom.xml pick-generator/scraper/hockey-scraper/pom.xml
+COPY pick-generator/database/pom.xml pick-generator/database/pom.xml
+COPY pick-generator/cli/pom.xml pick-generator/cli/pom.xml
+COPY pick-generator/claude/pom.xml pick-generator/claude/pom.xml
 COPY download-server/pom.xml download-server/pom.xml
-COPY llm-article-writer/database/pom.xml llm-article-writer/database/pom.xml
-COPY llm-article-writer/cli/pom.xml llm-article-writer/cli/pom.xml
-COPY llm-article-writer/llm-writer/pom.xml llm-article-writer/llm-writer/pom.xml
-COPY llm-article-writer/scraper/pom.xml llm-article-writer/scraper/pom.xml
 COPY pom.xml pom.xml
 
 RUN mvn -B -e dependency:go-offline
@@ -19,14 +22,20 @@ WORKDIR /opt/app
 
 COPY --from=dependencies /root/.m2 /root/.m2
 COPY download-server download-server
-COPY llm-article-writer llm-article-writer
+COPY pick-generator  pick-generator
 COPY pom.xml pom.xml
 
-RUN mvn -B -e clean package -DskipTests
+RUN mvn -B -e -T 1C clean package -pl ./download-server -am -DskipTests
 
 FROM eclipse-temurin:21 AS app
 
 WORKDIR /opt/app
 COPY --from=builder /opt/app/download-server/target/donwload-server-0.0.1-jar-with-dependencies.jar download-server-0.0.1.jar
+
+ENV MYSQL_HOST=""
+ENV MYSQL_PORT=""
+ENV MYSQL_DB=""
+ENV MYSQL_USER=""
+ENV MYSQL_PW=""
 
 ENTRYPOINT java -jar download-server-0.0.1.jar

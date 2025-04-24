@@ -17,7 +17,7 @@ fun Application.routeModule() {
     val mysqlPassword = environment.config.property("mysql.pw").getString()
 
     val db = Database.connect(
-        url = "jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDatabase}",
+        url = "jdbc:mysql://${mysqlHost}:${mysqlPort}/${mysqlDatabase}".also { println("jdbc_url: $it") },
         user = mysqlUser,
         password = mysqlPassword
     )

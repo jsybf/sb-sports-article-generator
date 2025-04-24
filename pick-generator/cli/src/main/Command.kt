@@ -45,7 +45,7 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
         }
 
         val db = Database.connect(
-            url = "jdbc:mysql://${mysqlHost!!}:${mysqlPort!!}/${mysqlDatabase!!}",
+            url = "jdbc:mysql://${mysqlHost!!}:${mysqlPort!!}/${mysqlDatabase!!}".also { println("jdbc_url: ${it}") },
             user = mysqlUser!!,
             password = mysqlPassword!!
         )
