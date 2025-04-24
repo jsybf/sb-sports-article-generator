@@ -16,8 +16,8 @@ import kotlinx.serialization.json.buildJsonObject
 
 object SpojoyBaseballScrapePipeline : ScrapePipeline<League.Baseball> {
     override suspend fun scrapeFixtureUrls(browserPool: PlaywrightBrowserPool, league: League.Baseball): List<String> {
-        logger.info("scraping spojoy-baseball-match-list-page(url=https://www.spojoy.com/live/?mct=baseball)")
-        return browserPool.scrapeMatchListPage().extractMlbMatchList()
+        logger.info("scraping spojoy-baseball-match-list-page(url=${league.matchListPageUrl})")
+        return browserPool.scrapeMatchListPage(league).extractMlbMatchList()
     }
 
     override suspend fun scrapeMatch(browserPool: PlaywrightBrowserPool, league: League.Baseball, matchUrl: String): Result<Pair<MatchInfo, LLMAttachment>> = coroutineScope {

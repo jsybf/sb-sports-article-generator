@@ -25,7 +25,9 @@ sealed interface League {
         KHL("KHL", URI("https://www.flashscore.co.kr/hockey/russia/khl/fixtures/")),
     }
 
-    enum class Baseball(override val leagueName: String, override val sportsName: String = "baseball") : League {
-        KBO("KBO"), MLB("MLB"), NPB("NPB"),
+    enum class Baseball(override val leagueName: String, val matchListPageUrl: URI, override val sportsName: String = "baseball") : League {
+        KBO("KBO", URI("https://www.spojoy.com/live/?mct=baseball&sct=201")),
+        MLB("MLB", URI("https://www.spojoy.com/live/?mct=baseball&sct=202")),
+        NPB("NPB", URI("https://www.spojoy.com/live/?mct=baseball&sct=208")),
     }
 }

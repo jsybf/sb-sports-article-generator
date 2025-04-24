@@ -16,7 +16,7 @@ class SpojoyBaseballScrapePipelineTest {
     fun `example 1`() = runBlocking {
         val browserPool = PlaywrightBrowserPool(3)
 
-        val matchUrls: List<String> = SpojoyBaseballScrapePipeline.scrapeFixtureUrls(browserPool, League.Baseball.MLB)
+        val matchUrls: List<String> = SpojoyBaseballScrapePipeline.scrapeFixtureUrls(browserPool, League.Baseball.KBO)
 
         matchUrls
             .asFlow()

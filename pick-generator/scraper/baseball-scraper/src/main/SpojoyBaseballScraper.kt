@@ -2,16 +2,16 @@ package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.*
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
 
-internal suspend fun PlaywrightBrowserPool.scrapeMatchListPage(): BaseballMatchListPage {
-    val matchListPageURL = "https://www.spojoy.com/live/?mct=baseball"
+internal suspend fun PlaywrightBrowserPool.scrapeMatchListPage(league: League.Baseball): BaseballMatchListPage {
     return this
         .doAndGetDocAsync {
-            logger.debug("scraping spojoy-baseball-match-list-page (url=${matchListPageURL})")
-            navigate(matchListPageURL)
+            logger.debug("scraping spojoy-baseball-match-list-page (url=${league.matchListPageUrl})")
+            navigate(league.matchListPageUrl.toString())
         }
         .await()
         .let { BaseballMatchListPage(it) }
