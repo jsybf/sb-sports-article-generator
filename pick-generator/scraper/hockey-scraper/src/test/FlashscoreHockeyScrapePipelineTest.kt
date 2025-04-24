@@ -1,7 +1,6 @@
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.FlashscoreHockeyScrapePipeline
-import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.HockeyMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
-import kotlinx.coroutines.channels.ReceiveChannel
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -12,7 +11,7 @@ class FlashscoreHockeyScrapePipelineTest {
         val browserPool = PlaywrightBrowserPool(3)
         val scrapePipeline = FlashscoreHockeyScrapePipeline(browserPool)
 
-        val matchInfoReceiver: ReceiveChannel<HockeyMatchInfo> = scrapePipeline.getFixtureUrl()
+        val matchInfoReceiver = scrapePipeline.getFixtureUrl(League.Hockey.NHL)
             .let { matchUrls -> with(scrapePipeline) { scrape(matchUrls) } }
 
         matchInfoReceiver

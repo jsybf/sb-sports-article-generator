@@ -40,7 +40,6 @@ class PlaywrightBrowserPool(
         semaphore.acquire()
         val worker = workerChannel.receive()
         try {
-            logger.trace("executing doAndGetDoc")
             return scrapeRetry(2) { worker.doAndGetDoc(action) }
         } finally {
             workerChannel.send(worker)
