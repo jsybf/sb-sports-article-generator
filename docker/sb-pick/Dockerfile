@@ -3,11 +3,14 @@ FROM maven:3.9-eclipse-temurin-21 AS dependencies
 
 WORKDIR /opt/app
 
-COPY llm-article-writer/cli/pom.xml llm-article-writer/cli/pom.xml
-COPY llm-article-writer/database/pom.xml llm-article-writer/database/pom.xml
-COPY llm-article-writer/llm-writer/pom.xml llm-article-writer/llm-writer/pom.xml
-COPY llm-article-writer/scraper/pom.xml llm-article-writer/scraper/pom.xml
-COPY download-server/pom.xml download-server/pom.xml
+COPY pick-generator/scraper/baseball-scraper pick-generator/scraper/baseball-scraper
+COPY pick-generator/scraper/basketball-scraper pick-generator/scraper/basketball-scraper
+COPY pick-generator/scraper/hockey-scraper pick-generator/scraper/hockey-scraper
+COPY pick-generator/scraper/database pick-generator/scraper/database
+COPY pick-generator/cli pick-generator/cli
+COPY pick-generator/claude pick-generator/claude
+COPY download-server download-server
+
 COPY pom.xml pom.xml
 
 RUN mvn -B -e dependency:go-offline
@@ -18,16 +21,16 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /opt/app
 
 COPY --from=dependencies /root/.m2 /root/.m2
-COPY llm-article-writer  llm-article-writer
+COPY pick-generator  pick-generator
 COPY download-server  download-server
 COPY pom.xml pom.xml
 
-RUN mvn -B -e -T 1C  clean package -pl ./llm-article-writer/cli -am -DskipTests
+RUN mvn -B -e -T 1C  clean package -pl ./pick-generator/cli -am -DskipTests
 
 FROM eclipse-temurin:21 AS app
-ARG cliJar=cli-0.0.1.jar
-WORKDIR /opt/app
-COPY --from=builder /opt/app/${cliJar} ${cliJar}
+ARG cliJar=cli-0.0.1-jar-with-.jar
+WORKDIR /
+COPY --from=builder /opt/app/pick-generator/cli/target/cli-fatjar-0.0.1.jar cli-fatjar-0.0.1.jar
 
 # playwright의 의존성들 다운로드
 RUN java -jar ${cliJar} install-browser

@@ -18,8 +18,8 @@ local-mysql-up:
       -e TZ=Asia/Seoul \
       -p 3306:3306 \
       mysql:8.4
-    @echo "sleep 5sec. waiting for mysql to be ready for connection"
-    sleep 5
+    @echo "sleep 10sec. waiting for mysql to be ready for connection"
+    sleep 10
     mysql --host 127.0.0.1 --user=root --password=root_pass test_db < ./ddl/ddl.sql
 
 local-mysql-down:
@@ -31,7 +31,7 @@ pick-server-ec2-up stack_name="pick-download-server":
         set -x
         aws cloudformation create-stack \
             --no-cli-pager \
-            --stack-name {{stack_name}} \
+            --stack-name {{ stack_name }} \
             --template-body file://aws/ec2-cfn.yml \
             --capabilities CAPABILITY_IAM \
             --parameters '[
