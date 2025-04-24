@@ -54,6 +54,9 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
         val pickRepo = PickRepository(db)
         val browserPool = PlaywrightBrowserPool(4)
         val claudeClient = AnthropicOkHttpClient.builder().apiKey(claudeApiKey!!).build()
+
+        val existingMatchUrls = sportsMatchRepo.findFixtures().map { it.matchUniqueUrl }.toSet()
+
         runBlocking {
             scrapeAndGeneratePick(
                 claudeClient = claudeClient,
@@ -61,7 +64,7 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
                 pickRepo = pickRepo,
                 scrapePipelineContainer = ScraperPipelineContainer(browserPool),
                 leagues = leagues,
-                filteringUrls = emptySet()
+                filteringUrls = existingMatchUrls
             )
         }
     }

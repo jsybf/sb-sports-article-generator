@@ -8,7 +8,22 @@ download-server-docker-build:
     docker build -t download-server:{{ download_server_version }} -f ./docker/download-server/Dockerfile .
 
 cli-package:
-    mvn -T 1C package -pl ./llm-article-writer/cli -am -DskipTests
+    mvn -T 1C package -pl ./pick-generator/cli -am -DskipTests
+
+local-mysql-up:
+    docker run -d --rm \
+      --name mysql \
+      -e MYSQL_DATABASE=test_db \
+      -e MYSQL_ROOT_PASSWORD=root_pass \
+      -e TZ=Asia/Seoul \
+      -p 3306:3306 \
+      mysql:8.4
+    @echo "sleep 5sec. waiting for mysql to be ready for connection"
+    sleep 5
+    mysql --host 127.0.0.1 --user=root --password=root_pass test_db < ./ddl/ddl.sql
+
+local-mysql-down:
+    docker stop mysql
 
 pick-server-ec2-up stack_name="pick-download-server":
     #!/usr/bin/env sh
