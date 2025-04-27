@@ -29,16 +29,13 @@ RUN mvn -B -e -T 1C  clean package -DskipTests
 FROM eclipse-temurin:21 AS app
 ARG cliJar=cli-0.0.1-jar-with-.jar
 WORKDIR /
-COPY --from=browser_installer_builder /opt/app/target/browser-installer-fatjar-0.0.1.jar browser-installer-fatjar-0.0.1.jar
+
+COPY --from=browser_installer_builder /opt/app/target/browser-installer-fatjar-0.0.1.jar browser-installer-fatjar.jar
 # playwright의 의존성들 다운로드
-RUN java -jar browser-installer-fatjar-0.0.1.jar && rm browser-installer-fatjar-0.0.1.jar
+RUN java -jar browser-installer-fatjar.jar && rm browser-installer-fatjar.jar
 # 아래의 환경변수를 세팅안해주면 firfox, webkit을 컨테이너를 실행할따마다 다운로드 받음
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-COPY --from=app_builder /opt/app/pick-generator/cli/target/cli-fatjar-0.0.1.jar cli-fatjar-0.0.1.jar
-ENV SB_PICK_MYSQL_HOST=""
-ENV SB_PICK_MYSQL_PORT=""
-ENV SB_PICK_MYSQL_USER=""
-ENV SB_PICK_MYSQL_PW=""
-ENV SB_PICK_MYSQL_DB=""
-ENV SB_PICK_CLAUDE_API_KEY=""
-CMD java -Duser.timezone=Asia/Seoul -jar cli-fatjar-0.0.1.jar --include "hockey.*,basketball.*"
+
+COPY --from=app_builder /opt/app/pick-generator/cli/target/cli-fatjar-0.0.1.jar cli.jar
+ENV TZ="Asia/Seoul"
+CMD java -jar cli.jar --include "hockey.*,basketball.*"

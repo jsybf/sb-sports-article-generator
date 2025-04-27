@@ -1,0 +1,74 @@
+Parameters:
+  FamilyName:
+    Type: String
+    Default: sb-pick---pick-generator
+
+  ContainerImageUri:
+    Type: String
+    Default: '384052067743.dkr.ecr.ap-northeast-2.amazonaws.com/sb-pick/pick-generator:latest'
+
+Resources:
+  EcsTaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  BatchJobTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref FamilyName
+      RequiresCompatibilities:
+        - FARGATE
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
+      Cpu: '2048'
+      Memory: '4GB'
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt EcsTaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: batch-job
+          Image: !Ref ContainerImageUri
+          Essential: true
+          Environment:
+            - Name: SB_PICK_MYSQL_HOST
+              Value: 'please_set_in_RunTask_command'
+            - Name: SB_PICK_MYSQL_PORT
+              Value: 'please_set_in_RunTask_command'
+            - Name: SB_PICK_MYSQL_USER
+              Value: 'please_set_in_RunTask_command'
+            - Name: SB_PICK_MYSQL_PW
+              Value: 'please_set_in_RunTask_command'
+            - Name: SB_PICK_MYSQL_DB
+              Value: 'please_set_in_RunTask_command'
+            - Name: SB_PICK_CLAUDE_API_KEY
+              Value: 'please_set_in_RunTask_command'
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+              mode: non-blocking
+              awslogs-create-group: 'true'
+              max-buffer-size: 25m
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/sb-pick/pick-generator
+      RetentionInDays: 14
+
+
+Outputs:
+  TaskDefinitionArn:
+    Description: The ARN of the ECS Task Definition
+    Value: !Ref BatchJobTask

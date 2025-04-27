@@ -1,0 +1,15 @@
+Parameters:
+  EcrName:
+    Type: String
+    Default: sb-pick/pick-generator
+
+Resources:
+  EcrRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      EmptyOnDelete: true # deleting the repository force deletes the content of repository
+      RepositoryName: !Ref EcrName
+
+Outputs:
+  RepositoryUri:
+    Value: !GetAtt EcrRepo.RepositoryUri

@@ -1,0 +1,21 @@
+Parameters:
+  EcsClusterName:
+    Type: String
+    Default: sb-pick-cluster
+
+Resources:
+  EcsCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Ref EcsClusterName
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enhanced
+
+Outputs:
+  EcsCluster:
+    Value: !Ref EcsCluster
+
