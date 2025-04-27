@@ -38,4 +38,4 @@ ENV MYSQL_DB=""
 ENV MYSQL_USER=""
 ENV MYSQL_PW=""
 
-ENTRYPOINT java -jar download-server-0.0.1.jar
+ENTRYPOINT java -Duser.timezone=Asia/Seoul -jar download-server-0.0.1.jar

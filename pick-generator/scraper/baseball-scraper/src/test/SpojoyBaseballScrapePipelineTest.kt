@@ -21,7 +21,7 @@ class SpojoyBaseballScrapePipelineTest {
         matchUrls
             .asFlow()
             .map { matchUrl ->
-                val scrapedResult: Result<Pair<MatchInfo, LLMAttachment>> = SpojoyBaseballScrapePipeline.scrapeMatch(browserPool, League.Baseball.MLB, matchUrl)
+                val scrapedResult: Result<Pair<MatchInfo, LLMAttachment>> = SpojoyBaseballScrapePipeline.scrapeMatch(browserPool, League.Baseball.KBO, matchUrl)
 
                 scrapedResult.getOrElse { exception: Throwable ->
                     when (exception) {

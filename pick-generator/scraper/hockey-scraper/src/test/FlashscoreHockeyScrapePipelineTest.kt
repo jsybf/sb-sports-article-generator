@@ -14,7 +14,7 @@ import org.junit.Test
 class FlashscoreHockeyScrapePipelineTest {
     @Test
     fun `example 1`() = runBlocking {
-        val browserPool = PlaywrightBrowserPool(3)
+        val browserPool = PlaywrightBrowserPool(1)
 
         val matchUrls: List<String> = FlashscoreHockeyScrapePipeline.scrapeFixtureUrls(browserPool, League.Hockey.NHL)
 

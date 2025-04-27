@@ -3,6 +3,7 @@ package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.extractors.*
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballScraped
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
@@ -42,6 +43,7 @@ object SpojoyBaseballScrapePipeline : ScrapePipeline<League.Baseball> {
                     .map { playerPageUrl -> async { browserPool.scrapePlayerPage(playerPageUrl) } }
                     .awaitAll()
             }
+            if (!startingPitchersPage.await().ifStartingPitcherUploaded()) throw RequiredPageNotFound("starting pitcher is not uploaded")
             val (homeTeamName, awayTeamName) = matchPage.await().extractTeamName()
             val baseballMatchInfo = BaseballMatchInfo(
                 awayTeam = awayTeamName,

@@ -4,6 +4,13 @@ import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.StartingPitce
 import kotlinx.serialization.json.*
 import org.jsoup.nodes.Document
 
+internal fun StartingPitcerPage.ifStartingPitcherUploaded(): Boolean {
+    return !this.doc
+        .select("table .pitcher_text #contents_text_data")
+        .map { it.text() }
+        .contains("선발 투수 발표전입니다.")
+}
+
 internal fun StartingPitcerPage.extractPitcherStats(): JsonObject {
     return buildJsonObject {
         put("homePitcher", extractPitcherInfo(this@extractPitcherStats.doc, "home"))

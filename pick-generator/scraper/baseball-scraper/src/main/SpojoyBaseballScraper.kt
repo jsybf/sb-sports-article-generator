@@ -1,5 +1,6 @@
 package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
+import com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.*
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
@@ -32,6 +33,8 @@ internal suspend fun PlaywrightBrowserPool.scrapeStartingPitcherPage(matchPageUr
         .doAndGetDocAsync {
             logger.debug("scraping spojoy-baseball-staring-pitcher-page (matchPageUrl=${matchPageUrl})")
             navigate(matchPageUrl)
+            locator("#mainmenu_tab00").click()
+            assertThat(locator("table .pitcher_text #contents_text_data").first()).isVisible()
         }
         .await()
         .let { StartingPitcerPage(it) }
