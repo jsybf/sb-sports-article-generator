@@ -11,7 +11,8 @@ import org.jsoup.nodes.Document
 class PlaywrightBrowserPool(
     private val workerNum: Int
 ) : AutoCloseable {
-    private val playwrightDispatcher = Dispatchers.IO.limitedParallelism(workerNum, "playwright-browser-pool")
+    @OptIn(DelicateCoroutinesApi::class)
+    private val playwrightDispatcher = newFixedThreadPoolContext(workerNum, "browser-pool")
     private val semaphore = Semaphore(workerNum)
     private val workerChannel = Channel<PlaywrightBrowser>(workerNum)
     private val scope = CoroutineScope(SupervisorJob() + playwrightDispatcher)
