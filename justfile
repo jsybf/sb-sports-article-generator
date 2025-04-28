@@ -5,7 +5,7 @@ download_server_version := "0.0.1"
 compile-pick-generator:
     mvn -T 1C package -pl ./pick-generator/cli -am -DskipTests
 
-local-pick-generator-run jar_params claude_api_key:
+local-run-pick-generator jar_params claude_api_key:
     SB_PICK_MYSQL_HOST='127.0.0.1' \
     SB_PICK_MYSQL_PORT='3306' \
     SB_PICK_MYSQL_USER='root' \

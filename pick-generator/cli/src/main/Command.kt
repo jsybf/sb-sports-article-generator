@@ -1,8 +1,10 @@
 package io.gitp.sbpick.pickgenerator.pickgenerator
 
+import ch.qos.logback.classic.Level
 import com.anthropic.client.okhttp.AnthropicOkHttpClient
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
+import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.split
@@ -12,6 +14,7 @@ import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowser
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
+import org.slf4j.LoggerFactory
 
 class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
     private val mysqlHost by option("--mysql_host", envvar = "SB_PICK_MYSQL_HOST")
@@ -25,6 +28,9 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
     private val allFlag: Boolean by option("--all").flag()
     private val excludes: List<String>? by option("--exclude").split(",")
     private val includes: List<String>? by option("--include").split(",")
+
+    private val logLevel: Level? by option("--log-level").convert { Level.toLevel(it) }
+
 
     override fun run() {
         // validate arguments
@@ -57,6 +63,10 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
 
         val existingMatchUrls = sportsMatchRepo.findFixtures().map { it.matchUniqueUrl }.toSet()
 
+        if (logLevel != null) {
+            val rootLogger = LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
+            rootLogger.level = logLevel
+        }
         runBlocking {
             scrapeGeneratePersistPick(
                 leagues = leagues,
