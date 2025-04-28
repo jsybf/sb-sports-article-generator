@@ -9,12 +9,12 @@ import java.time.format.DateTimeFormatter
 
 internal fun BasketballMatchPage.extractTeams(): Pair<String, String> {
     val homeTeam = this.doc
-        .select("#detail > div.duelParticipant > div.duelParticipant__home > div.participant__participantNameWrapper > div.participant__participantName.participant__overflow > a")
+        .select("#detail  div.duelParticipant div.duelParticipant__home div.participant__participantNameWrapper div.participant__participantName.participant__overflow a")
         .first()!!
         .text()
 
     val awayTeam = this.doc
-        .select("#detail > div.duelParticipant > div.duelParticipant__away > div.participant__participantNameWrapper > div.participant__participantName.participant__overflow > a")
+        .select("#detail div.duelParticipant div.duelParticipant__away div.participant__participantNameWrapper div.participant__participantName.participant__overflow a")
         .first()!!
         .text()
 
@@ -25,7 +25,7 @@ internal fun BasketballMatchPage.extractMatchAt(): LocalDateTime {
     val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
 
     val matchDateTimeStr = doc
-        .select("#detail > div.duelParticipant > div.duelParticipant__startTime > div")
+        .select("#detail div.duelParticipant div.duelParticipant__startTime div")
         .first()!!
         .text()
 
