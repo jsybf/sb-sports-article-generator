@@ -64,7 +64,7 @@ build-pick-generator:
 #parma should be form like '"--include", "hockey.*"'
 aws-run-pick-generator param db_pw claude_api_key db_host="54.180.248.188" db_port="3306" db_user="root":
     aws ecs run-task \
-        --no-pager \
+        --no-cli-pager \
         --cluster sb-pick-cluster \
         --task-definition sb-pick---pick-generator \
         --launch-type FARGATE \
