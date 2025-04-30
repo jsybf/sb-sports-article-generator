@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
 
 internal fun HockeyMatchPage.extractTeams(): Pair<String, String> {
     val homeTeam = this.doc
-        .select("#detail  div.duelParticipant div.duelParticipant__home div.participant__participantNameWrapper div.participant__participantName.participant__overflow a")
+        .select("#detail div.duelParticipant div.duelParticipant__home div.participant__participantNameWrapper div.participant__participantName.participant__overflow a")
         .first()!!
         .text()
 

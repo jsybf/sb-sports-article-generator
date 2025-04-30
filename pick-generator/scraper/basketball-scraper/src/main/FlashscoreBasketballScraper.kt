@@ -24,6 +24,7 @@ internal suspend fun PlaywrightBrowserPool.scrapeMatchPage(matchPageUrl: String)
         .doAndGetDocAsync {
             logger.debug("scraping flashscore-basketball-match-page(url=${matchPageUrl})")
             navigate(matchPageUrl)
+            assertThat(locator("#detail div.duelParticipant")).isVisible()
         }
         .await()
         .let { BasketballMatchPage(it) }

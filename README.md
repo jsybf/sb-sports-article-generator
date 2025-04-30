@@ -15,6 +15,11 @@ just local-pick-generator-run "INPUT_YOUR_PARAM" "INPUT_YOUR_CLAUDE_API_KEY"
 just local-mysql-down
 ```
 
+## how to push pick-generator image
+```bash
+just push-pick-generator
+```
+
 ---
 
 # reference
