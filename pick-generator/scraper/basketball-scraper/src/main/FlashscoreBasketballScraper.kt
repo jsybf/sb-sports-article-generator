@@ -24,7 +24,10 @@ internal suspend fun PlaywrightBrowserPool.scrapeMatchPage(matchPageUrl: String)
         .doAndGetDocAsync {
             logger.debug("scraping flashscore-basketball-match-page(url=${matchPageUrl})")
             navigate(matchPageUrl)
-            assertThat(locator("#detail div.duelParticipant")).isVisible()
+            listOf(
+                "#detail  div.duelParticipant div.duelParticipant__home div.participant__participantNameWrapper div.participant__participantName.participant__overflow a",
+                "#detail div.duelParticipant div.duelParticipant__away div.participant__participantNameWrapper div.participant__participantName.participant__overflow a"
+            ).forEach { selector -> assertThat(locator(selector)).isVisible() }
         }
         .await()
         .let { BasketballMatchPage(it) }

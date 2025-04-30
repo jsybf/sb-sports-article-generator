@@ -22,5 +22,5 @@ CREATE TABLE IF NOT EXISTS pick(
   output_tokens INT NOT NULL,
 
   PRIMARY KEY(pick_id),
-  FOREIGN KEY (sports_match_id) REFERENCES sports_match (sports_match_id)
+  FOREIGN KEY (sports_match_id) REFERENCES sports_match (sports_match_id) ON DELETE CASCADE
 );
