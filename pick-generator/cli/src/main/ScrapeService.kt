@@ -66,7 +66,7 @@ internal suspend fun AnthropicClient.generatePick(
 ): ClaudeResp {
     val generatedPick: ClaudeResp = this.requestAsync(maxRetry, duration) {
         model(Model.CLAUDE_3_7_SONNET_20250219)
-        maxTokens(4000L)
+        maxTokens(8000L)
         systemOfTextBlockParams(
             listOf(
                 TextBlockParam.builder()
