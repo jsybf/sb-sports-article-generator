@@ -1,5 +1,16 @@
+set dotenv-load
+
 pick_generator_version := "0.0.1"
 download_server_version := "0.0.1"
+
+echo-env:
+    @echo "SB_PICK_MYSQL_HOST=${SB_PICK_MYSQL_HOST}"
+    @echo "SB_PICK_MYSQL_PORT=${SB_PICK_MYSQL_PORT}"
+    @echo "SB_PICK_MYSQL_USER=${SB_PICK_MYSQL_USER}"
+    @echo "SB_PICK_MYSQL_PW=${SB_PICK_MYSQL_PW}"
+    @echo "SB_PICK_MYSQL_DB=${SB_PICK_MYSQL_DB}"
+    @echo "SB_PICK_CLAUDE_API_KEY=${SB_PICK_CLAUDE_API_KEY}"
+    @echo "PICK_GENERATOR_ECR_URI=${PICK_GENERATOR_ECR_URI}"
 
 # ## recipes related to local build,run,test
 compile-pick-generator:
@@ -47,22 +58,21 @@ aws-deploy-pick-generator-taskdef:
         --capabilities CAPABILITY_IAM
 
 ### recipes related to docker
-pick_generator_ecr_uri := "384052067743.dkr.ecr.ap-northeast-2.amazonaws.com"
 
 push-pick-generator: build-pick-generator
-    aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin {{ pick_generator_ecr_uri }}
-    docker tag sb-pick/pick-generator:{{ pick_generator_version }} {{ pick_generator_ecr_uri }}/sb-pick/pick-generator:{{ pick_generator_version }}
-    docker tag sb-pick/pick-generator:{{ pick_generator_version }} {{ pick_generator_ecr_uri }}/sb-pick/pick-generator:latest
-    docker push  {{ pick_generator_ecr_uri }}/sb-pick/pick-generator:{{ pick_generator_version }}
-    docker push  {{ pick_generator_ecr_uri }}/sb-pick/pick-generator:latest
+    aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${PICK_GENERATOR_ECR_URI}
+    docker tag sb-pick/pick-generator:{{ pick_generator_version }} ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:{{ pick_generator_version }}
+    docker tag sb-pick/pick-generator:{{ pick_generator_version }} ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
+    docker push  ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:{{ pick_generator_version }}
+    docker push  ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
 
 build-pick-generator:
-    docker build -t sb-pick/pick-generator:{{ pick_generator_version }} -f ./docker/pick-generator/Dockerfile .
+    docker buildx build --platform linux/arm64,linux/amd64 -t sb-pick/pick-generator:{{ pick_generator_version }} -f ./docker/pick-generator/Dockerfile .
 
 ### recipes related to ecs-run
 
 #parma should be form like '"--include", "hockey.*"'
-aws-run-pick-generator param db_pw claude_api_key db_host="54.180.248.188" db_port="3306" db_user="root":
+aws-run-pick-generator param:
     aws ecs run-task \
         --no-cli-pager \
         --cluster sb-pick-cluster \
@@ -75,35 +85,15 @@ aws-run-pick-generator param db_pw claude_api_key db_host="54.180.248.188" db_po
                     { \
                         "name": "batch-job", \
                         "environment": [ \
-                            {"name": "SB_PICK_MYSQL_HOST", "value": "{{ db_host }}"}, \
-                            {"name": "SB_PICK_MYSQL_PORT", "value": "{{ db_port }}"}, \
-                            {"name": "SB_PICK_MYSQL_USER", "value": "{{ db_user }}"}, \
-                            {"name": "SB_PICK_MYSQL_PW", "value": "{{ db_pw }}"}, \
-                            {"name": "SB_PICK_MYSQL_DB", "value": "sb-pick"}, \
-                            {"name": "SB_PICK_CLAUDE_API_KEY", "value": "{{ claude_api_key }}"} \
+                            {"name": "SB_PICK_MYSQL_HOST", "value": "'"${SB_PICK_MYSQL_HOST}"'"}, \
+                            {"name": "SB_PICK_MYSQL_PORT", "value": "'"${SB_PICK_MYSQL_PORT}"'"}, \
+                            {"name": "SB_PICK_MYSQL_USER", "value": "'"${SB_PICK_MYSQL_USER}"'"}, \
+                            {"name": "SB_PICK_MYSQL_PW", "value": "'"${SB_PICK_MYSQL_PW}"'"}, \
+                            {"name": "SB_PICK_MYSQL_DB", "value": "'"${SB_PICK_MYSQL_DB}"'"}, \
+                            {"name": "SB_PICK_CLAUDE_API_KEY", "value": "'"${SB_PICK_CLAUDE_API_KEY}"'"} \
                         ], \
                         "command": ["java", "-jar", "cli.jar", {{ param }}] \
                     } \
                 ] \
             } \
         '
-
-### deprecated recipes
-
-download-server-docker-build:
-    docker build -t sb-pick/download-server:{{ download_server_version }} -f ./docker/download-server/Dockerfile .
-
-pick-server-ec2-up stack_name="pick-download-server":
-    #!/usr/bin/env sh
-        set -e
-        set -x
-        aws cloudformation create-stack \
-            --no-cli-pager \
-            --stack-name {{ stack_name }} \
-            --template-body file://aws/ec2-cfn.yml \
-            --capabilities CAPABILITY_IAM \
-            --parameters '[
-            {"ParameterKey": "Ec2InstanceType", "ParameterValue":"t4g.small" },
-            {"ParameterKey": "Ec2Name", "ParameterValue":"pick-download-server" },
-            {"ParameterKey": "EbsVolumeSize", "ParameterValue":"50" }
-        ]'
