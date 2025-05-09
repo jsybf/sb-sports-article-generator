@@ -4,3 +4,4 @@ docs/
 test-data/
 *.jar
 .env
+.iml

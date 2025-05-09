@@ -1,5 +1,6 @@
 package io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models
 
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import org.jsoup.nodes.Document
 
 internal data class BaseballMatchListPage(
@@ -20,4 +21,9 @@ internal data class BaseballPlayerListPage(
 
 internal data class BaseballPlayerPage(
     val doc: Document
+)
+
+internal data class NaverSportsMatchListPage(
+    val doc: Document,
+    val league: League.Baseball
 )
