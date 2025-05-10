@@ -23,7 +23,11 @@ internal data class BaseballPlayerPage(
     val doc: Document
 )
 
-internal data class NaverSportsMatchListPage(
+internal data class NaverSportsBaseballMatchListPage(
     val doc: Document,
     val league: League.Baseball
+)
+
+internal data class NaverSportsBaseballMatchPage(
+    val doc: Document
 )

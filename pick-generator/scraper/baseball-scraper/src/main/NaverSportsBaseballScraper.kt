@@ -1,6 +1,6 @@
 package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
-import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsMatchListPage
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchListPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.BaseballTeam
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
@@ -16,7 +16,7 @@ data class NaverSportsMatch(
 )
 
 internal object NaverSportsBaseballScraper {
-    suspend fun scrapeFixturePage(browserPool: PlaywrightBrowserPool, league: League.Baseball, date: LocalDate): NaverSportsMatchListPage {
+    suspend fun scrapeFixturePage(browserPool: PlaywrightBrowserPool, league: League.Baseball, date: LocalDate): NaverSportsBaseballMatchListPage {
         val fixturePageUrl = when (league) {
             League.Baseball.MLB -> "https://m.sports.naver.com/wbaseball/schedule/index?date=${date}"
             League.Baseball.NPB -> "https://m.sports.naver.com/wbaseball/schedule/index?date=${date}"
@@ -29,12 +29,12 @@ internal object NaverSportsBaseballScraper {
                 this.navigate(fixturePageUrl)
             }
             .await()
-            .let { NaverSportsMatchListPage(it, league) }
+            .let { NaverSportsBaseballMatchListPage(it, league) }
     }
 }
 
 private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-internal fun NaverSportsMatchListPage.parseFixtures(): List<NaverSportsMatch> {
+internal fun NaverSportsBaseballMatchListPage.parseFixtures(): List<NaverSportsMatch> {
     return this.doc
         .select(".ScheduleAllType_match_list_group__1nFDy")
         .firstOrNull { element ->
