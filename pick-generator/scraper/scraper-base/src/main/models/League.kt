@@ -1,6 +1,5 @@
 package io.gitp.sbpick.pickgenerator.scraper.scrapebase.models
 
-import java.net.URI
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -18,13 +17,14 @@ sealed interface League {
         }
     }
 
-    enum class Basketball(override val leagueName: String, val matchListPageUrl: URI, override val sportsName: String = "basketball") : League {
-        CBA("CBA", URI("https://www.flashscore.co.kr/basketball/china/cba/fixtures/")),
+    enum class Basketball(override val leagueName: String, val matchListPageUrl: String, override val sportsName: String = "basketball") : League {
+        CBA("CBA", "https://www.flashscore.co.kr/basketball/china/cba/fixtures/"),
     }
 
     enum class Hockey(override val leagueName: String, val matchListPageUrl: String, override val sportsName: String = "hockey") : League {
         NHL("NHL", "https://www.flashscore.co.kr/hockey/usa/nhl/fixtures/"),
         KHL("KHL", "https://www.flashscore.co.kr/hockey/russia/khl/fixtures/"),
+        WORLD("세계선수권", "https://www.flashscore.co.kr/hockey/world/world-championship/fixtures/"),
     }
 
     enum class Baseball(override val leagueName: String, val matchListPageUrl: (matchAt: LocalDate) -> String, override val sportsName: String = "baseball") : League {
