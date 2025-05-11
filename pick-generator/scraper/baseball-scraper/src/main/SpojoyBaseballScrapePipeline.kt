@@ -2,6 +2,7 @@ package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.extractors.*
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballScraped
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.SpojoyBaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
@@ -23,7 +24,10 @@ object SpojoyBaseballScrapePipeline {
 
     suspend fun scrapeFixtureUrl(browserPool: PlaywrightBrowserPool, league: League.Baseball, matchAt: LocalDate): List<SpojoyBaseballMatchInfo> {
         logger.info("scraping spojoy-baseball-match-list-page(url=${league.matchListPageUrl(matchAt)})")
-        return browserPool.scrapeMatchListPage(league, matchAt).extractMlbMatchList()
+        val spojoyFixtureList: List<SpojoyBaseballMatchInfo> =  browserPool.scrapeMatchListPage(league, matchAt).extractMlbMatchList()
+        logger.info("scraping naver-sports-baseball-match-list-page(url=${league.matchListPageUrl(matchAt)})")
+        val naverSportsFixtureList: List<NaverSportsBaseballMatchInfo> = NaverSportsBaseballScraper.scrapeFixturePage(browserPool, league, matchAt).extractFixtures()
+
     }
 
     suspend fun scrapeMatch(browserPool: PlaywrightBrowserPool, league: League.Baseball, matchUrl: String): Result<Pair<MatchInfo, LLMAttachment>> = coroutineScope {
