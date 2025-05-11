@@ -1,48 +1,38 @@
 package io.gitp.sbpick.pickgenerator.scraper.hockeyscraper
 
-import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.extractors.*
+import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.extractors.extractMatchInfo
+import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.extractors.extractOdds
+import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.extractors.parseMatchSummary
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.HockeyMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.models.HockeyScraped
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
 
-object FlashscoreHockeyScrapePipeline : ScrapePipeline<League.Hockey> {
-
-    override suspend fun scrapeFixtureUrls(browserPool: PlaywrightBrowserPool, league: League.Hockey): List<String> {
+object FlashscoreHockeyScrapePipeline {
+    suspend fun scrapeFixtures(browserPool: PlaywrightBrowserPool, league: League.Hockey, matchAt: LocalDate): List<HockeyMatchInfo> {
         logger.info("scraping flashscore-hockey-fixtures-page(league={}, url={})", league, league.matchListPageUrl)
-        return browserPool.scrapeMatchListPage(league).extractMatchUrls()
+        return browserPool.scrapeMatchListPage(league).extractMatchInfo().filter { it.matchAt.toLocalDate() == matchAt }
     }
 
-    override suspend fun scrapeMatch(browserPool: PlaywrightBrowserPool, league: League.Hockey, matchUrl: String): Result<Pair<MatchInfo, LLMAttachment>> = coroutineScope {
-        logger.info("scraping hockey-match(match_page_url={})", matchUrl)
+    suspend fun scrapeMatch(browserPool: PlaywrightBrowserPool, matchInfo: HockeyMatchInfo): Result<LLMAttachment> = coroutineScope {
+        logger.info("scraping hockey-match(match_page_url={})", matchInfo.flashscoreDetailPageUrl)
         runCatching {
-            val matchPage = async { browserPool.scrapeMatchPage(matchUrl) }
-            val oneXTwoBetOdds = async { browserPool.scrapeOneXTwoBetPage(matchUrl).extractOdds() }
-            val overUnderBetOdds = async { browserPool.scrapeOverUnderBetPage(matchUrl).extractOdds() }
+            val matchPage = async { browserPool.scrapeMatchPage(matchInfo.flashscoreDetailPageUrl) }
+            val oneXTwoBetOdds = async { browserPool.scrapeOneXTwoBetPage(matchInfo.flashscoreDetailPageUrl).extractOdds() }
+            val overUnderBetOdds = async { browserPool.scrapeOverUnderBetPage(matchInfo.flashscoreDetailPageUrl).extractOdds() }
 
-            if (oneXTwoBetOdds.await().size == 0 || oneXTwoBetOdds.await().size == 0) throw RequiredPageNotFound("odds section of ${matchUrl}")
+            if (oneXTwoBetOdds.await().size == 0 || oneXTwoBetOdds.await().size == 0) throw RequiredPageNotFound("odds section of ${matchInfo.flashscoreDetailPageUrl}")
 
-            val (homeTeam, awayTeam) = matchPage.await().extractTeams()
-            val matchInfo: HockeyMatchInfo = HockeyMatchInfo(
-                awayTeam = awayTeam,
-                homeTeam = homeTeam,
-                matchAt = matchPage.await().extractMatchAt(),
-                league = matchPage.await().extractLeague(),
-                matchUniqueUrl = matchUrl
-            )
-            val scrapdResult: HockeyScraped = HockeyScraped(
+            HockeyScraped(
                 matchSummary = matchPage.await().parseMatchSummary(),
                 oneXTwoBet = oneXTwoBetOdds.await(),
                 overUnderBet = overUnderBetOdds.await(),
             )
-
-            Pair(matchInfo, scrapdResult)
         }
     }
 }

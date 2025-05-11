@@ -9,7 +9,7 @@ import io.gitp.pickgenerator.claude.requestAsync
 import io.gitp.sbpick.pickgenerator.database.models.SportsMatchDto
 import io.gitp.sbpick.pickgenerator.database.repositories.PickRepository
 import io.gitp.sbpick.pickgenerator.database.repositories.SportsMatchRepository
-import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.SpojoyBaseballScrapePipeline
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.BaseballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.FlashscoreBasketballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.FlashscoreHockeyScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
@@ -17,56 +17,77 @@ import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowser
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: enum에 파일 프로퍼티를 추가하든 해야할 듯. 매호출마다 파일을 다시 읽어드림...
 private fun readResourceFile(path: String): String = object {}::class.java.getResource(path)?.readText() ?: throw Exception("can't find ${path} in resource")
 
-private object ScraperModuleContainer {
-    data class ScraperModule(
-        val prompt: String,
-        val scrapePipline: ScrapePipeline<League>
-    )
+private object PromptContainer {
+    private val hockeyPrompt = readResourceFile("/hockey-prompt.txt")
+    private val basketballPrompt = readResourceFile("/basketball-prompt.txt")
+    private val baseballPrompt = readResourceFile("/basketball-prompt.txt")
 
-    private val hockeyModule = ScraperModule(readResourceFile("/hockey-prompt.txt"), FlashscoreHockeyScrapePipeline)
-    private val baseketballModule = ScraperModule(readResourceFile("/basketball-prompt.txt"), FlashscoreBasketballScrapePipeline)
-    private val baseballModule = ScraperModule(readResourceFile("/baseball-prompt.txt"), SpojoyBaseballScrapePipeline)
-
-    fun findByLeague(league: League): ScraperModule = when (league) {
-        is League.Hockey -> hockeyModule
-        is League.Baseball -> baseballModule
-        is League.Basketball -> baseketballModule
+    fun findByLeague(league: League): String = when (league) {
+        is League.Hockey -> hockeyPrompt
+        is League.Baseball -> basketballPrompt
+        is League.Basketball -> baseballPrompt
     }
 }
 
 internal interface ScrapeService<L : League> {
-    suspend fun scrape(browserPool: PlaywrightBrowserPool, league: L, excludeMatches: Set<MatchInfo>): Flow<Result<Pair<MatchInfo, LLMAttachment>>>
+    suspend fun scrape(browserPool: PlaywrightBrowserPool, league: L, matchAt: LocalDate): Flow<Result<Pair<MatchInfo, LLMAttachment>>>
 }
 
 internal object BaseballScrapeService : ScrapeService<League.Baseball> {
-    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.Baseball, excludeMatches: Set<MatchInfo>): Flow<Result<Pair<MatchInfo, LLMAttachment>>> = flow {
+    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.Baseball, matchAt: LocalDate): Flow<Result<Pair<MatchInfo, LLMAttachment>>> {
+        return BaseballScrapePipeline
+            .scrapeFixtures(browserPool, league, matchAt)
+            .asFlow()
+            .map { matchInfo -> BaseballScrapePipeline.scrapeMatch(browserPool, matchInfo).mapCatching { Pair(matchInfo, it) } }
+    }
+}
 
+internal object HockeyScrapeService : ScrapeService<League.Hockey> {
+    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.Hockey, matchAt: LocalDate): Flow<Result<Pair<MatchInfo, LLMAttachment>>> {
+        return FlashscoreHockeyScrapePipeline
+            .scrapeFixtures(browserPool, league, matchAt)
+            .asFlow()
+            .map { matchInfo -> FlashscoreHockeyScrapePipeline.scrapeMatch(browserPool, matchInfo).mapCatching { Pair(matchInfo, it) } }
+    }
+}
+
+internal object BasketballScrapeService : ScrapeService<League.Basketball> {
+    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.Basketball, matchAt: LocalDate): Flow<Result<Pair<MatchInfo, LLMAttachment>>> {
+        return FlashscoreBasketballScrapePipeline
+            .scrapeFixtures(browserPool, league, matchAt)
+            .asFlow()
+            .map { matchInfo -> FlashscoreBasketballScrapePipeline.scrapeMatch(browserPool, matchInfo).mapCatching { Pair(matchInfo, it) } }
     }
 }
 
 
-internal fun PlaywrightBrowserPool.scrape(
+suspend fun PlaywrightBrowserPool.scrape(
     league: League,
-    filteringUrls: Set<String>
-): Flow<Result<Pair<MatchInfo, LLMAttachment>>> = flow {
-    val (_, scraperPipeline) = ScraperModuleContainer.findByLeague(league)
-
-    val matchUrls = scraperPipeline.scrapeFixtureUrls(this@scrape, league).subtract(filteringUrls)
-
-    for (matchUrl in matchUrls) {
-        emit(scraperPipeline.scrapeMatch(this@scrape, league, matchUrl))
+    excludeMatches: Set<MatchInfo>,
+    matchAt: LocalDate
+): Flow<Result<Pair<MatchInfo, LLMAttachment>>> {
+    return when (league) {
+        is League.Basketball -> BasketballScrapeService.scrape(this, league, matchAt)
+        is League.Baseball -> BaseballScrapeService.scrape(this, league, matchAt)
+        is League.Hockey -> HockeyScrapeService.scrape(this, league, matchAt)
     }
+        .filterNot { scrapeResult: Result<Pair<MatchInfo, LLMAttachment>> ->
+            scrapeResult
+                .getOrNull()
+                ?.first
+                ?.let { matchInfo -> excludeMatches.any { it.isEqual(matchInfo) } }
+                ?: false
+        }
 }
 
 internal suspend fun AnthropicClient.generatePick(
@@ -95,17 +116,18 @@ internal suspend fun AnthropicClient.generatePick(
 @OptIn(ExperimentalCoroutinesApi::class)
 internal suspend fun scrapeGeneratePersistPick(
     leagues: Set<League>,
-    filteringUrls: Set<String>,
+    excludeMatches: Set<MatchInfo>,
     browserPool: PlaywrightBrowserPool,
     claudeClient: AnthropicClient,
     sportsMatchRepo: SportsMatchRepository,
     pickRepo: PickRepository,
-    maxRetry: Int = 2,
-    duration: Duration = 60.seconds,
+    matchAt: LocalDate
+    // maxRetry: Int = 2,
+    // duration: Duration = 60.seconds,
 ) {
     leagues
         .asFlow()
-        .map { league -> browserPool.scrape(league, filteringUrls) }
+        .map { league -> browserPool.scrape(league, excludeMatches, matchAt) }
         .flattenConcat()
         .map { scrapeResult: Result<Pair<MatchInfo, LLMAttachment>> ->
             val (matchInfo, scrapedResult) = scrapeResult.getOrElse { exception ->
@@ -118,7 +140,7 @@ internal suspend fun scrapeGeneratePersistPick(
                 }
             }
             val pickResp: ClaudeResp = withContext(Dispatchers.IO) {
-                claudeClient.generatePick(scrapedResult, ScraperModuleContainer.findByLeague(matchInfo.league).prompt)
+                claudeClient.generatePick(scrapedResult, PromptContainer.findByLeague(matchInfo.league))
             }
             Pair(matchInfo, pickResp)
         }

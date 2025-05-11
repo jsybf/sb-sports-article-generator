@@ -30,8 +30,8 @@ internal fun NaverSportsBaseballMatchListPage.extractFixtures(): List<NaverSport
                 League.Baseball.NPB -> BaseballTeam.NPBTeam.Companion::findByAnyCode
             }
             NaverSportsBaseballMatchInfo(
-                homeTeam = findByAnyCode(matchUri.slice(14..15)).enumName(),
-                awayTeam = findByAnyCode(matchUri.slice(16..17)).enumName(),
+                homeTeam = findByAnyCode(matchUri.slice(16..17)).enumName(),
+                awayTeam = findByAnyCode(matchUri.slice(14..15)).enumName(),
                 matchAt = LocalDateTime.of(LocalDate.parse(matchUri.slice(6..13), dateFormatter), LocalTime.of(0, 0, 0)),
                 league = this.league,
                 matchDetailPageUrl = "https://m.sports.naver.com${matchUri}"

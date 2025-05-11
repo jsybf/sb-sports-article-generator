@@ -1,4 +1,4 @@
-set dotenv-load
+set dotenv-load := true
 
 pick_generator_version := "0.0.1"
 download_server_version := "0.0.1"
@@ -67,11 +67,11 @@ push-pick-generator: build-pick-generator
     docker push  ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
 
 build-pick-generator:
-    docker buildx build --platform linux/arm64,linux/amd64 -t sb-pick/pick-generator:{{ pick_generator_version }} -f ./docker/pick-generator/Dockerfile .
+    docker buildx build --platform linux/arm64 -t sb-pick/pick-generator:{{ pick_generator_version }} -f ./docker/pick-generator/Dockerfile .
 
 ### recipes related to ecs-run
 
-#parma should be form like '"--include", "hockey.*"'
+# parma should be form like '"--include", "hockey.*"'
 aws-run-pick-generator param:
     aws ecs run-task \
         --no-cli-pager \

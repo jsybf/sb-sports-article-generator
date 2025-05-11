@@ -1,47 +1,38 @@
 package io.gitp.sbpick.pickgenerator.scraper.basketballscraper
 
-import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.*
+import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractMatchInfo
+import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractMatchSummary
+import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.extractors.extractOdds
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.models.BasketballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.models.BasketballScraped
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.ScrapePipeline
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
 
-object FlashscoreBasketballScrapePipeline : ScrapePipeline<League.Basketball> {
-    override suspend fun scrapeFixtureUrls(browserPool: PlaywrightBrowserPool, league: League.Basketball): List<String> {
+object FlashscoreBasketballScrapePipeline {
+    suspend fun scrapeFixtures(browserPool: PlaywrightBrowserPool, league: League.Basketball, matchAt: LocalDate): List<BasketballMatchInfo> {
         logger.info("scraping flashscore-basketball-fixtures-page(league={}, url={})", league, league.matchListPageUrl)
-        return browserPool.scrapeMatchListPage(league).extractMatchUrls()
+        return browserPool.scrapeMatchListPage(league).extractMatchInfo().filter { it.matchAt.toLocalDate() == matchAt }
     }
 
-    override suspend fun scrapeMatch(browserPool: PlaywrightBrowserPool, league: League.Basketball, matchUrl: String): Result<Pair<MatchInfo, LLMAttachment>> = coroutineScope {
-        logger.info("scraping basketball-match(match_page_url={})", matchUrl)
+    suspend fun scrapeMatch(browserPool: PlaywrightBrowserPool, matchInfo: BasketballMatchInfo): Result<LLMAttachment> = coroutineScope {
+        logger.info("scraping basketball-match(match_page_url={})", matchInfo.flashscoreDetailPageUrl)
         runCatching {
-            val matchPage = async { browserPool.scrapeMatchPage(matchUrl) }
-            val oneXTwoBetOdds = async { browserPool.scrapeOneXTwoBetPage(matchUrl).extractOdds() }
-            val overUnderBetOdds = async { browserPool.scrapeOverUnderBetPage(matchUrl).extactOdds() }
+            val matchPage = async { browserPool.scrapeMatchPage(matchInfo.flashscoreDetailPageUrl) }
+            val oneXTwoBetOdds = async { browserPool.scrapeOneXTwoBetPage(matchInfo.flashscoreDetailPageUrl).extractOdds() }
+            val overUnderBetOdds = async { browserPool.scrapeOverUnderBetPage(matchInfo.flashscoreDetailPageUrl).extractOdds() }
 
-            if (oneXTwoBetOdds.await().size == 0 || oneXTwoBetOdds.await().size == 0) throw RequiredPageNotFound("odds section of ${matchUrl}")
+            if (oneXTwoBetOdds.await().size == 0 || oneXTwoBetOdds.await().size == 0) throw RequiredPageNotFound("odds section of ${matchInfo.flashscoreDetailPageUrl}")
 
-            val (homeTeam, awayTeam) = matchPage.await().extractTeams()
-            val matchInfo: BasketballMatchInfo = BasketballMatchInfo(
-                awayTeam = awayTeam,
-                homeTeam = homeTeam,
-                matchAt = matchPage.await().extractMatchAt(),
-                league = matchPage.await().extractLeague(),
-                matchUniqueUrl = matchUrl
-            )
-            val scrapdResult: BasketballScraped = BasketballScraped(
+            BasketballScraped(
                 matchSummary = matchPage.await().extractMatchSummary(),
                 oneXTwoBet = oneXTwoBetOdds.await(),
                 overUnderBet = overUnderBetOdds.await(),
             )
-
-            Pair(matchInfo, scrapdResult)
         }
     }
 }

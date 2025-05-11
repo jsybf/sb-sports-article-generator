@@ -19,7 +19,6 @@ class SportsMatchRepository(
             it[homeTeam] = matchDto.homeTeam
             it[awayTeam] = matchDto.awayTeam
             it[matchAt] = matchDto.matchAt
-            it[matchUniqueUrl] = matchDto.matchUniqueUrl
         }.value
     }
 

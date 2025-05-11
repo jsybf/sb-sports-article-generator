@@ -8,13 +8,17 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.split
+import io.gitp.sbpick.pickgenerator.database.models.SportsMatchDto
 import io.gitp.sbpick.pickgenerator.database.repositories.PickRepository
 import io.gitp.sbpick.pickgenerator.database.repositories.SportsMatchRepository
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
+import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.Database
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
     private val mysqlHost by option("--mysql_host", envvar = "SB_PICK_MYSQL_HOST")
@@ -31,6 +35,21 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
 
     private val logLevel: Level? by option("--log-level").convert { Level.toLevel(it) }
 
+    private data class CommonMatchInfo(
+        override val awayTeam: String,
+        override val homeTeam: String,
+        override val matchAt: LocalDateTime,
+        override val league: League,
+    ) : MatchInfo {
+        companion object {
+            fun from(sportsMatchDto: SportsMatchDto): CommonMatchInfo = CommonMatchInfo(
+                awayTeam = sportsMatchDto.awayTeam,
+                homeTeam = sportsMatchDto.homeTeam,
+                matchAt = sportsMatchDto.matchAt,
+                league = sportsMatchDto.league
+            )
+        }
+    }
 
     override fun run() {
         // validate arguments
@@ -61,7 +80,7 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
         val browserPool = PlaywrightBrowserPool(4)
         val claudeClient = AnthropicOkHttpClient.builder().apiKey(claudeApiKey!!).build()
 
-        val existingMatchUrls = sportsMatchRepo.findFixtures().map { it.matchUniqueUrl }.toSet()
+        val existingMatches: Set<MatchInfo> = sportsMatchRepo.findFixtures().map { CommonMatchInfo.from(it) as MatchInfo }.toSet()
 
         if (logLevel != null) {
             val rootLogger = LoggerFactory.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME) as ch.qos.logback.classic.Logger
@@ -70,10 +89,22 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
         runBlocking {
             scrapeGeneratePersistPick(
                 leagues = leagues,
-                filteringUrls = existingMatchUrls,
+                excludeMatches = existingMatches,
                 browserPool = browserPool,
                 claudeClient = claudeClient,
                 sportsMatchRepo = sportsMatchRepo,
+                matchAt = LocalDate.now(),
+                pickRepo = pickRepo,
+            )
+        }
+        runBlocking {
+            scrapeGeneratePersistPick(
+                leagues = leagues,
+                excludeMatches = existingMatches,
+                browserPool = browserPool,
+                claudeClient = claudeClient,
+                sportsMatchRepo = sportsMatchRepo,
+                matchAt = LocalDate.now().plusDays(1),
                 pickRepo = pickRepo,
             )
         }

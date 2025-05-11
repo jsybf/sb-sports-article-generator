@@ -14,11 +14,9 @@ object SportsMatchTbl : UIntIdTable("sports_match", "sports_match_id") {
     val homeTeam = varchar("home_team", 30)
     val awayTeam = varchar("away_team", 30)
     val matchAt = datetime("match_at")
-    val matchUniqueUrl = varchar("match_unique_url", 255)
     val updatedAt = datetime("updated_at").defaultExpression(CurrentDateTime)
 
     init {
-        uniqueIndex(matchUniqueUrl)
         uniqueIndex(sports, league, homeTeam, awayTeam, matchAt)
     }
 }
@@ -43,7 +41,6 @@ class SportsMatchEntity(id: EntityID<UInt>) : UIntEntity(id) {
     var homeTeam by SportsMatchTbl.homeTeam
     var awayTeam by SportsMatchTbl.awayTeam
     var matchAt by SportsMatchTbl.matchAt
-    var matchUniqueUrl by SportsMatchTbl.matchUniqueUrl
     var updatedAt by SportsMatchTbl.updatedAt
 
     // 관계 매핑 - 해당 경기에 연결된 예측

@@ -12,7 +12,7 @@ internal suspend fun PlaywrightBrowserPool.scrapeMatchListPage(league: League.Ho
     return this
         .doAndGetDocAsync {
             logger.debug("scraping flashscore-hockey-match-list-page(url=${league.matchListPageUrl})")
-            navigate(league.matchListPageUrl.toString())
+            navigate(league.matchListPageUrl)
         }
         .await()
         .let { HockeyMatchListPage(it) }

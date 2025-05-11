@@ -1,5 +1,6 @@
-import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.SpojoyBaseballScrapePipeline
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.BaseballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.logger
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.BaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
@@ -10,18 +11,19 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.time.LocalDate
 
-class SpojoyBaseballScrapePipelineTest {
+class BaseballScrapePipelineTest {
     @Test
     fun `example 1`() = runBlocking {
         val browserPool = PlaywrightBrowserPool(3)
 
-        val matchUrls: List<String> = SpojoyBaseballScrapePipeline.scrapeFixtureUrls(browserPool, League.Baseball.KBO)
+        val matchUrls: List<MatchInfo> = BaseballScrapePipeline.scrapeFixtures(browserPool, League.Baseball.KBO, LocalDate.now().plusDays(1))
 
         matchUrls
             .asFlow()
-            .map { matchUrl ->
-                val scrapedResult: Result<Pair<MatchInfo, LLMAttachment>> = SpojoyBaseballScrapePipeline.scrapeMatch(browserPool, League.Baseball.KBO, matchUrl)
+            .map { matchInfo ->
+                val scrapedResult: Result<LLMAttachment> = BaseballScrapePipeline.scrapeMatch(browserPool, matchInfo as BaseballMatchInfo)
 
                 scrapedResult.getOrElse { exception: Throwable ->
                     when (exception) {
@@ -34,7 +36,7 @@ class SpojoyBaseballScrapePipelineTest {
                 }
             }
             .filterNotNull()
-            .collect { (matchInfo, llmAttachment) -> println(matchInfo) }
+            .collect { matchInfo -> println(matchInfo) }
 
         browserPool.close()
 

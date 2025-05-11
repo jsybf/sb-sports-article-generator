@@ -9,5 +9,5 @@ data class BasketballMatchInfo(
     override val homeTeam: String,
     override val matchAt: LocalDateTime,
     override val league: League,
-    override val matchUniqueUrl: String
+    val flashscoreDetailPageUrl: String
 ) : MatchInfo

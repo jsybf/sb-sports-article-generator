@@ -13,7 +13,6 @@ internal fun SportsMatchEntity.toSportsMatchDto(): SportsMatchDto {
         homeTeam = this.homeTeam,
         awayTeam = this.awayTeam,
         matchAt = this.matchAt,
-        matchUniqueUrl = matchUniqueUrl,
         updatedAt = this.matchAt,
     )
 }
@@ -24,7 +23,6 @@ data class SportsMatchDto(
     val homeTeam: String,
     val awayTeam: String,
     val matchAt: LocalDateTime,
-    val matchUniqueUrl: String,
     val updatedAt: LocalDateTime?
 ) {
     companion object {
@@ -34,7 +32,6 @@ data class SportsMatchDto(
             homeTeam = matchInfo.homeTeam,
             awayTeam = matchInfo.awayTeam,
             matchAt = matchInfo.matchAt,
-            matchUniqueUrl = matchInfo.matchUniqueUrl,
             updatedAt = null
         )
     }

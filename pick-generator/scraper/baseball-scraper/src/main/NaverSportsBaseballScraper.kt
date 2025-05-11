@@ -1,15 +1,10 @@
 package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
-import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchListPage
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.BaseballTeam
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
-import org.jsoup.nodes.Element
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 internal object NaverSportsBaseballScraper {
     suspend fun scrapeFixturePage(browserPool: PlaywrightBrowserPool, league: League.Baseball, date: LocalDate): NaverSportsBaseballMatchListPage {
@@ -26,5 +21,16 @@ internal object NaverSportsBaseballScraper {
             }
             .await()
             .let { NaverSportsBaseballMatchListPage(it, league) }
+    }
+
+    suspend fun scrapeMatchPage(browserPool: PlaywrightBrowserPool, matchUrl: String, date: LocalDate): NaverSportsBaseballMatchPage {
+        assert(matchUrl.startsWith("https://m.sports.naver.com/game"))
+        return browserPool
+            .doAndGetDocAsync {
+                navigate(matchUrl)
+            }
+            .await()
+            .let { NaverSportsBaseballMatchPage(it) }
+
     }
 }

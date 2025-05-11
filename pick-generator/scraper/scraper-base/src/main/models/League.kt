@@ -22,9 +22,9 @@ sealed interface League {
         CBA("CBA", URI("https://www.flashscore.co.kr/basketball/china/cba/fixtures/")),
     }
 
-    enum class Hockey(override val leagueName: String, val matchListPageUrl: URI, override val sportsName: String = "hockey") : League {
-        NHL("NHL", URI("https://www.flashscore.co.kr/hockey/usa/nhl/fixtures/")),
-        KHL("KHL", URI("https://www.flashscore.co.kr/hockey/russia/khl/fixtures/")),
+    enum class Hockey(override val leagueName: String, val matchListPageUrl: String, override val sportsName: String = "hockey") : League {
+        NHL("NHL", "https://www.flashscore.co.kr/hockey/usa/nhl/fixtures/"),
+        KHL("KHL", "https://www.flashscore.co.kr/hockey/russia/khl/fixtures/"),
     }
 
     enum class Baseball(override val leagueName: String, val matchListPageUrl: (matchAt: LocalDate) -> String, override val sportsName: String = "baseball") : League {

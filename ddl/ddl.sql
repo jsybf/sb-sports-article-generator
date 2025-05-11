@@ -5,11 +5,9 @@ CREATE TABLE IF NOT EXISTS sports_match(
   home_team VARCHAR(50) NOT NULL,
   away_team VARCHAR(50) NOT NULL,
   match_at DATETIME NOT NULL,
-  match_unique_url VARCHAR(255) NOT NULL, 
   updated_at TIMESTAMP NOT NULL default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   PRIMARY KEY(sports_match_id),
-  UNIQUE (match_unique_url),
   UNIQUE (sports, league, home_team, away_team, match_at)
 );
 

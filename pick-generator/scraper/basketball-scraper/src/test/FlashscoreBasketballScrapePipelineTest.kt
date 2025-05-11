@@ -4,34 +4,34 @@ import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
-import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
+import java.time.LocalDate
 
 class FlashscoreBasketballScrapePipelineTest {
     @Test
     fun `example 1`() = runBlocking {
         val browserPool = PlaywrightBrowserPool(3)
 
-        val matchUrls: List<String> = FlashscoreBasketballScrapePipeline.scrapeFixtureUrls(browserPool, League.Basketball.CBA)
+        val fixtures = FlashscoreBasketballScrapePipeline.scrapeFixtures(browserPool, League.Basketball.CBA, LocalDate.now())
 
-        matchUrls
+        fixtures
             .asFlow()
-            .map { matchUrl ->
-                val scrapedResult: Result<Pair<MatchInfo, LLMAttachment>> = FlashscoreBasketballScrapePipeline.scrapeMatch(browserPool, League.Basketball.CBA, matchUrl)
+            .map { matchInfo ->
+                val scrapedResult: Result<LLMAttachment> = FlashscoreBasketballScrapePipeline.scrapeMatch(browserPool, matchInfo)
 
                 scrapedResult.getOrElse { exception: Throwable ->
                     when (exception) {
                         is RequiredPageNotFound -> {
                             logger.warn(exception.message)
-                            return@map null
+                            return@getOrElse null
                         }
                         else -> throw exception
                     }
-                }
+                }?.let { Pair(matchInfo, it) }
             }
             .filterNotNull()
             .collect { (matchInfo, llmAttachment) -> println(matchInfo) }
