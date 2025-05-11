@@ -1,7 +1,25 @@
 package io.gitp.sbpick.pickgenerator.scraper.scrapebase.models
 
 sealed interface BaseballTeam {
-    enum class NPBTeam(val naverSportsCode: String, val spojoyCode: String) : BaseballTeam {
+    val spojoyCode: String
+    val naverSportsCode: String
+
+    fun enumName(): String
+
+    companion object {
+        val allEntries: List<BaseballTeam> = BaseballTeam::class.sealedSubclasses.flatMap { subclass -> subclass.java.enumConstants.toList() }.map { it as BaseballTeam }
+
+        fun findByNaverSportsCode(code: String): BaseballTeam {
+            return allEntries.find { it.naverSportsCode == code } ?: throw IllegalArgumentException("can't find BaseballTeam enum entry by '${code}'")
+        }
+
+        fun findBySpojoyCode(code: String): BaseballTeam {
+            return allEntries.find { it.spojoyCode == code } ?: throw IllegalArgumentException("can't find BaseballTeam enum entry by '${code}'")
+        }
+    }
+
+
+    enum class NPBTeam(override val naverSportsCode: String, override val spojoyCode: String) : BaseballTeam {
         NIPPONHAM("NH", "니혼햄"),
         YOMIURI("YO", "요미우리"),
         YOKOHAMA("YK", "요코하마"),
@@ -15,6 +33,8 @@ sealed interface BaseballTeam {
         ORIX("OX", "오릭스"),
         CHIBA_LOTTE_MARINES("JL", "지바롯데");
 
+        override fun enumName(): String = this.name
+
         companion object {
             fun findByAnyCode(code: String): BaseballTeam =
                 entries.find { it.naverSportsCode == code || it.spojoyCode == code } ?: throw IllegalArgumentException("can't find NPBTeam enum entry by '${code}'")
@@ -22,7 +42,7 @@ sealed interface BaseballTeam {
     }
 
 
-    enum class KBOTeam(val naverSportsCode: String, val sportsJoyCode: String) : BaseballTeam {
+    enum class KBOTeam(override val naverSportsCode: String, override val spojoyCode: String) : BaseballTeam {
         SAMSUNG("SS", "삼성"),
         KIWOOM("WO", "키움"),
         DOOSAN("OB", "두산"),
@@ -34,13 +54,16 @@ sealed interface BaseballTeam {
         NC("NC", "NC"),
         KT("KT", "kt");
 
+
+        override fun enumName(): String = this.name
+
         companion object {
             fun findByAnyCode(code: String): KBOTeam =
-                values().find { it.naverSportsCode == code || it.sportsJoyCode == code } ?: throw IllegalArgumentException("can't find KBOTeam enum entry by '${code}'")
+                values().find { it.naverSportsCode == code || it.spojoyCode == code } ?: throw IllegalArgumentException("can't find KBOTeam enum entry by '${code}'")
         }
     }
 
-    enum class MLBTeam(val naverSportsCode: String, val sportsJoyCode: String) : BaseballTeam {
+    enum class MLBTeam(override val naverSportsCode: String, override val spojoyCode: String) : BaseballTeam {
         MINNESOTA("MN", "미네소타"),
         BALTIMORE("BA", "볼티모어"),
         CINCINNATI("CI", "신시내티"),
@@ -72,9 +95,11 @@ sealed interface BaseballTeam {
         NEW_YORK_YANKEES("NY", "뉴욕양키스"),
         WASHINGTON("MO", "워싱턴");
 
+        override fun enumName(): String = this.name
+
         companion object {
             fun findByAnyCode(code: String): MLBTeam =
-                values().find { it.naverSportsCode == code || it.sportsJoyCode == code } ?: throw IllegalArgumentException("can't find MLBTeam enum entry by '${code}'")
+                values().find { it.naverSportsCode == code || it.spojoyCode == code } ?: throw IllegalArgumentException("can't find MLBTeam enum entry by '${code}'")
         }
     }
 

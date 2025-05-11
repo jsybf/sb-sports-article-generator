@@ -1,6 +1,8 @@
 package io.gitp.sbpick.pickgenerator.scraper.scrapebase.models
 
 import java.net.URI
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 sealed interface League {
     val sportsName: String
@@ -25,9 +27,12 @@ sealed interface League {
         KHL("KHL", URI("https://www.flashscore.co.kr/hockey/russia/khl/fixtures/")),
     }
 
-    enum class Baseball(override val leagueName: String, val matchListPageUrl: URI, override val sportsName: String = "baseball") : League {
-        KBO("KBO", URI("https://www.spojoy.com/live/?mct=baseball&sct=201")),
-        MLB("MLB", URI("https://www.spojoy.com/live/?mct=baseball&sct=202")),
-        NPB("NPB", URI("https://www.spojoy.com/live/?mct=baseball&sct=208")),
+    enum class Baseball(override val leagueName: String, val matchListPageUrl: (matchAt: LocalDate) -> String, override val sportsName: String = "baseball") : League {
+        KBO("KBO", { matchAt -> "https://www.spojoy.com/live/?mct=baseball&sct=201&pgTk=&sel_date=${spojoyDateFormatter.format(matchAt)}" }),
+        MLB("MLB", { matchAt -> "https://www.spojoy.com/live/?mct=baseball&sct=202&pgTk=&sel_date=${spojoyDateFormatter.format(matchAt)}" }),
+        NPB("NPB", { matchAt -> "https://www.spojoy.com/live/?mct=baseball&sct=208&pgTk=&sel_date=${spojoyDateFormatter.format(matchAt)}" });
+
     }
 }
+
+private val spojoyDateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")

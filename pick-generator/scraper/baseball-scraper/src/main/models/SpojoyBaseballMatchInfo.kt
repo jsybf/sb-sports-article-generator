@@ -4,12 +4,12 @@ import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
 import java.time.LocalDateTime
 
-data class BaseballMatchInfo(
+data class SpojoyBaseballMatchInfo(
     override val awayTeam: String,
     override val homeTeam: String,
     override val matchAt: LocalDateTime,
     override val league: League.Baseball,
-    override val matchUniqueUrl: String
-) : MatchInfo {
-}
+    val matchDetailPageUrl: String
+) : MatchInfo
+
 

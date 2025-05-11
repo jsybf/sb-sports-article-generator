@@ -7,5 +7,4 @@ interface MatchInfo {
     val awayTeam: String
     val matchAt: LocalDateTime
     val league: League
-    val matchUniqueUrl: String
 }

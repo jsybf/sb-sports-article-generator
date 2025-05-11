@@ -6,13 +6,14 @@ import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowser
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.time.LocalDate
 
 
-internal suspend fun PlaywrightBrowserPool.scrapeMatchListPage(league: League.Baseball): BaseballMatchListPage {
+internal suspend fun PlaywrightBrowserPool.scrapeMatchListPage(league: League.Baseball, matchAt: LocalDate): BaseballMatchListPage {
     return this
         .doAndGetDocAsync {
-            logger.debug("scraping spojoy-baseball-match-list-page (url=${league.matchListPageUrl})")
-            navigate(league.matchListPageUrl.toString())
+            logger.debug("scraping spojoy-baseball-match-list-page (url=${league.matchListPageUrl(matchAt)})")
+            navigate(league.matchListPageUrl(matchAt))
         }
         .await()
         .let { BaseballMatchListPage(it) }

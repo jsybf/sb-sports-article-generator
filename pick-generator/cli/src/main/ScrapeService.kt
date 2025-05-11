@@ -45,6 +45,17 @@ private object ScraperModuleContainer {
     }
 }
 
+internal interface ScrapeService<L : League> {
+    suspend fun scrape(browserPool: PlaywrightBrowserPool, league: L, excludeMatches: Set<MatchInfo>): Flow<Result<Pair<MatchInfo, LLMAttachment>>>
+}
+
+internal object BaseballScrapeService : ScrapeService<League.Baseball> {
+    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.Baseball, excludeMatches: Set<MatchInfo>): Flow<Result<Pair<MatchInfo, LLMAttachment>>> = flow {
+
+    }
+}
+
+
 internal fun PlaywrightBrowserPool.scrape(
     league: League,
     filteringUrls: Set<String>

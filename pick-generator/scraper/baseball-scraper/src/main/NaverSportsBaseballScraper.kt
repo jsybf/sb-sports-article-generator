@@ -1,19 +1,15 @@
 package io.gitp.sbpick.pickgenerator.scraper.baseballscraper
 
+import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchInfo
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.models.NaverSportsBaseballMatchListPage
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.BaseballTeam
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import org.jsoup.nodes.Element
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-
-data class NaverSportsMatch(
-    val homeTeam: BaseballTeam,
-    val awayTeam: BaseballTeam,
-    val matchDate: LocalDate,
-    val url: String
-)
 
 internal object NaverSportsBaseballScraper {
     suspend fun scrapeFixturePage(browserPool: PlaywrightBrowserPool, league: League.Baseball, date: LocalDate): NaverSportsBaseballMatchListPage {
@@ -34,7 +30,7 @@ internal object NaverSportsBaseballScraper {
 }
 
 private val dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-internal fun NaverSportsBaseballMatchListPage.parseFixtures(): List<NaverSportsMatch> {
+internal fun NaverSportsBaseballMatchListPage.parseFixtures(): List<NaverSportsBaseballMatchInfo> {
     return this.doc
         .select(".ScheduleAllType_match_list_group__1nFDy")
         .firstOrNull { element ->
@@ -52,11 +48,12 @@ internal fun NaverSportsBaseballMatchListPage.parseFixtures(): List<NaverSportsM
                 League.Baseball.MLB -> BaseballTeam.MLBTeam.Companion::findByAnyCode
                 League.Baseball.NPB -> BaseballTeam.NPBTeam.Companion::findByAnyCode
             }
-            NaverSportsMatch(
-                homeTeam = findByAnyCode(matchUri.slice(14..15)),
-                awayTeam = findByAnyCode(matchUri.slice(16..17)),
-                matchDate = LocalDate.parse(matchUri.slice(6..13), dateFormatter),
-                url = "https://m.sports.naver.com${matchUri}"
+            NaverSportsBaseballMatchInfo(
+                homeTeam = findByAnyCode(matchUri.slice(14..15)).enumName(),
+                awayTeam = findByAnyCode(matchUri.slice(16..17)).enumName(),
+                matchAt = LocalDateTime.of(LocalDate.parse(matchUri.slice(6..13), dateFormatter), LocalTime.of(0, 0, 0)),
+                league = this.league,
+                matchDetailPageUrl = "https://m.sports.naver.com${matchUri}"
             )
         }
         ?: emptyList()
