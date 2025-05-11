@@ -9,7 +9,7 @@
 ## run pick-generator in local
 `local-pick-generator-run`의 첫번째 매개변수는 [[#pick-generator cli]]참고
 ```bash
-just comppile-pick-generator
+just compile-pick-generator
 just local-mysql-up
 just local-pick-generator-run "INPUT_YOUR_PARAM" "INPUT_YOUR_CLAUDE_API_KEY"
 just local-mysql-down
