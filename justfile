@@ -69,6 +69,12 @@ push-pick-generator: build-pick-generator
 build-pick-generator:
     docker buildx build --platform linux/arm64 -t sb-pick/pick-generator:{{ pick_generator_version }} -f ./docker/pick-generator/Dockerfile .
 
+build-download-server:
+    docker buildx build --platform linux/arm64 -t gitp/download-server:{{ pick_generator_version }} -f ./docker/download-server/Dockerfile .
+
+push-download-server:  build-download-server
+    docker push gitp/download-server:{{ pick_generator_version }}
+
 ### recipes related to ecs-run
 
 # parma should be form like '"--include", "hockey.*"'
