@@ -25,6 +25,7 @@ sealed interface League {
         NHL("NHL", "https://www.flashscore.co.kr/hockey/usa/nhl/fixtures/"),
         KHL("KHL", "https://www.flashscore.co.kr/hockey/russia/khl/fixtures/"),
         WORLD("세계선수권", "https://www.flashscore.co.kr/hockey/world/world-championship/fixtures/"),
+        AHL("AHL", "https://www.flashscore.co.kr/hockey/usa/ahl/fixtures/"),
     }
 
     enum class Baseball(override val leagueName: String, val matchListPageUrl: (matchAt: LocalDate) -> String, override val sportsName: String = "baseball") : League {
