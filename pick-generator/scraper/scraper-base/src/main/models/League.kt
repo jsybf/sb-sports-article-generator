@@ -19,6 +19,7 @@ sealed interface League {
 
     enum class Basketball(override val leagueName: String, val matchListPageUrl: String, override val sportsName: String = "basketball") : League {
         CBA("CBA", "https://www.flashscore.co.kr/basketball/china/cba/fixtures/"),
+        WNBA("WNBA", "https://www.flashscore.co.kr/basketball/usa/wnba/fixtures/"),
     }
 
     enum class Hockey(override val leagueName: String, val matchListPageUrl: String, override val sportsName: String = "hockey") : League {
