@@ -36,6 +36,6 @@ RUN java -jar browser-installer-fatjar.jar && rm browser-installer-fatjar.jar
 # 아래의 환경변수를 세팅안해주면 firfox, webkit을 컨테이너를 실행할따마다 다운로드 받음
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
-COPY --from=app_builder /opt/app/pick-generator/cli/target/cli-fatjar-0.0.1.jar cli.jar
+COPY --from=app_builder /opt/app/pick-generator/cli/target/cli-fatjar-0.0.2.jar cli.jar
 ENV TZ="Asia/Seoul"
 CMD java -jar cli.jar --include "hockey.*,basketball.*"

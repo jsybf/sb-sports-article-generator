@@ -30,12 +30,6 @@ RUN mvn -B -e -T 1C clean package -pl ./download-server -am -DskipTests
 FROM eclipse-temurin:21 AS app
 
 WORKDIR /opt/app
-COPY --from=builder /opt/app/download-server/target/donwload-server-0.0.1-jar-with-dependencies.jar download-server-0.0.1.jar
+COPY --from=builder /opt/app/download-server/target/donwload-server-0.0.2-jar-with-dependencies.jar download-server.jar
 
-ENV MYSQL_HOST=""
-ENV MYSQL_PORT=""
-ENV MYSQL_DB=""
-ENV MYSQL_USER=""
-ENV MYSQL_PW=""
-
-ENTRYPOINT java -Duser.timezone=Asia/Seoul -jar download-server-0.0.1.jar
+ENTRYPOINT java -Duser.timezone=Asia/Seoul -jar download-server.jar
