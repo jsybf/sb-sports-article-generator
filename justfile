@@ -1,7 +1,7 @@
 set dotenv-load := true
 
-pick_generator_version := "0.0.1"
-download_server_version := "0.0.1"
+pick_generator_version := "0.0.2"
+download_server_version := "0.0.2"
 
 echo-env:
     @echo "SB_PICK_MYSQL_HOST=${SB_PICK_MYSQL_HOST}"
