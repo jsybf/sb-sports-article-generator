@@ -33,6 +33,7 @@ class PickRepository(
 
         SportsMatchEntity
             .wrapRows(query)
-            .map { sportsMatchEntity -> Pair(sportsMatchEntity.toSportsMatchDto(), sportsMatchEntity.pick!!.toPickDto()) }
+            .map { sportsMatchEntity -> Pair(sportsMatchEntity.toSportsMatchDto(), sportsMatchEntity.pick?.toPickDto() ?: return@map null) }
+            .filterNotNull()
     }
 }

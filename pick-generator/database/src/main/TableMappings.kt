@@ -43,7 +43,6 @@ class SportsMatchEntity(id: EntityID<UInt>) : UIntEntity(id) {
     var matchAt by SportsMatchTbl.matchAt
     var updatedAt by SportsMatchTbl.updatedAt
 
-    // 관계 매핑 - 해당 경기에 연결된 예측
     val pick: PickEntity? by PickEntity optionalBackReferencedOn PickTbl.sportsMatchId
 }
 
