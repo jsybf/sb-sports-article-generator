@@ -67,12 +67,22 @@ push-pick-generator: build-pick-generator
     docker push  ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
 
 build-pick-generator:
-    docker buildx build --platform linux/arm64 -t sb-pick/pick-generator:{{ pick_generator_version }} -f ./docker/pick-generator/Dockerfile .
+    docker buildx build \
+        --platform linux/arm64 \
+        -t sb-pick/pick-generator:{{ pick_generator_version }} \
+        -f ./docker/pick-generator/Dockerfile \
+        --build-arg app_version={{ pick_generator_version }} \
+        .
 
 build-download-server:
-    docker buildx build --platform linux/arm64 -t gitp/download-server:{{ pick_generator_version }} -f ./docker/download-server/Dockerfile .
+    docker buildx build \
+        --platform linux/arm64 \
+        -t gitp/download-server:{{ pick_generator_version }} \
+        -f ./docker/download-server/Dockerfile \
+        --build-arg app_version={{ download_server_version }} \
+        .
 
-push-download-server:  build-download-server
+push-download-server: build-download-server
     docker push gitp/download-server:{{ pick_generator_version }}
 
 ### recipes related to ecs-run

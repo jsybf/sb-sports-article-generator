@@ -7,6 +7,7 @@ COPY pick-generator/scraper/scraper-base/pom.xml pick-generator/scraper/scraper-
 COPY pick-generator/scraper/baseball-scraper/pom.xml pick-generator/scraper/baseball-scraper/pom.xml
 COPY pick-generator/scraper/basketball-scraper/pom.xml pick-generator/scraper/basketball-scraper/pom.xml
 COPY pick-generator/scraper/hockey-scraper/pom.xml pick-generator/scraper/hockey-scraper/pom.xml
+COPY pick-generator/scraper/soccer-minor-scraper/pom.xml pick-generator/scraper/soccer-minor-scraper/pom.xml
 COPY pick-generator/database/pom.xml pick-generator/database/pom.xml
 COPY pick-generator/cli/pom.xml pick-generator/cli/pom.xml
 COPY pick-generator/claude/pom.xml pick-generator/claude/pom.xml
@@ -15,7 +16,6 @@ COPY pom.xml pom.xml
 
 RUN mvn -B -e dependency:go-offline
 
-# build jar
 FROM maven:3.9-eclipse-temurin-21 AS builder
 
 WORKDIR /opt/app
@@ -30,6 +30,7 @@ RUN mvn -B -e -T 1C clean package -pl ./download-server -am -DskipTests
 FROM eclipse-temurin:21 AS app
 
 WORKDIR /opt/app
-COPY --from=builder /opt/app/download-server/target/donwload-server-0.0.2-jar-with-dependencies.jar download-server.jar
+ARG app_version
+COPY --from=builder /opt/app/download-server/target/donwload-server-${app_version}-jar-with-dependencies.jar download-server.jar
 
 ENTRYPOINT java -Duser.timezone=Asia/Seoul -jar download-server.jar
