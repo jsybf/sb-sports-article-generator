@@ -17,6 +17,7 @@ import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowser
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.League
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.MatchInfo
+import io.gitp.sbpick.pickgenerator.scraper.soccerminorscraper.FlashscoreMinorSoccerScrapePipeline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -31,11 +32,13 @@ private object PromptContainer {
     private val hockeyPrompt = readResourceFile("/hockey-prompt.txt")
     private val basketballPrompt = readResourceFile("/basketball-prompt.txt")
     private val baseballPrompt = readResourceFile("/basketball-prompt.txt")
+    private val minorSoccerPrompt = readResourceFile("/minor-soccer-prompt.txt")
 
     fun findByLeague(league: League): String = when (league) {
         is League.Hockey -> hockeyPrompt
         is League.Baseball -> basketballPrompt
         is League.Basketball -> baseballPrompt
+        is League.MinorSoccer -> minorSoccerPrompt
     }
 }
 
@@ -71,6 +74,16 @@ internal object BasketballScrapeService : ScrapeService<League.Basketball> {
 }
 
 
+internal object MinorSoccerScrapeService : ScrapeService<League.MinorSoccer> {
+    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.MinorSoccer, matchAt: LocalDate): Flow<Result<Pair<MatchInfo, LLMAttachment>>> {
+        return FlashscoreMinorSoccerScrapePipeline
+            .scrapeFixtures(browserPool, league, matchAt)
+            .asFlow()
+            .map { matchInfo -> FlashscoreMinorSoccerScrapePipeline.scrapeMatch(browserPool, matchInfo).mapCatching { Pair(matchInfo, it) } }
+    }
+}
+
+
 suspend fun PlaywrightBrowserPool.scrape(
     league: League,
     excludeMatches: Set<MatchInfo>,
@@ -80,6 +93,7 @@ suspend fun PlaywrightBrowserPool.scrape(
         is League.Basketball -> BasketballScrapeService.scrape(this, league, matchAt)
         is League.Baseball -> BaseballScrapeService.scrape(this, league, matchAt)
         is League.Hockey -> HockeyScrapeService.scrape(this, league, matchAt)
+        is League.MinorSoccer -> MinorSoccerScrapeService.scrape(this, league, matchAt)
     }
         .filterNot { scrapeResult: Result<Pair<MatchInfo, LLMAttachment>> ->
             scrapeResult

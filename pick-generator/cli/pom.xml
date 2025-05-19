@@ -49,6 +49,11 @@
         </dependency>
         <dependency>
             <groupId>io.gitp</groupId>
+            <artifactId>soccer-minor-scraper</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.gitp</groupId>
             <artifactId>database</artifactId>
             <version>${project.version}</version>
         </dependency>

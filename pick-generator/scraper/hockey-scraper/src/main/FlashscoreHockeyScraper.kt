@@ -39,7 +39,7 @@ internal suspend fun PlaywrightBrowserPool.scrapeOneXTwoBetPage(matchPageUrl: St
         .doAndGetDocAsync {
             logger.debug("scraping flashscore-hockey-1x2bet-page (matchPageUrl=${matchPageUrl})")
             navigate(matchPageUrl)
-            locator(".detailOver a:nth-child(2)").click()
+            locator("#detail div.detailOver  div a:nth-child(2)").click()
             locator(".wcl-tabs_jyS9b.wcl-tabsSecondary_SsnrA > a:nth-child(1)").click()
             assertThat(locator("#detail")).isVisible()
         }

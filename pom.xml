@@ -15,6 +15,7 @@
         <module>pick-generator/scraper/hockey-scraper</module>
         <module>pick-generator/scraper/baseball-scraper</module>
         <module>pick-generator/scraper/basketball-scraper</module>
+        <module>pick-generator/scraper/soccer-minor-scraper</module>
         <module>pick-generator/database</module>
         <module>pick-generator/claude</module>
         <module>pick-generator/cli</module>
