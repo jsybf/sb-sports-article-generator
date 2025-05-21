@@ -34,9 +34,9 @@ internal fun NaverSportsBaseballMatchPage.extractStartingPitcherMostPitches(): J
             .take(3)
             .forEach { mostPitchElement ->
                 addJsonObject {
-                    put("구종", mostPitchElement.selectFirst(".StartPlayer_type__1LRwJ")!!.text())
-                    put("구속", mostPitchElement.selectFirst(".StartPlayer_speed__3UlYQ")!!.text())
-                    put("비율(퍼센트)", mostPitchElement.selectFirst(".StartPlayer_number__1SRt9")!!.text())
+                    put("구종", mostPitchElement.selectFirst(".StartPlayer_type__1LRwJ")?.text() ?: "not uploaded")
+                    put("구속", mostPitchElement.selectFirst(".StartPlayer_speed__3UlYQ")?.text() ?: "not uploaded")
+                    put("비율(퍼센트)", mostPitchElement.selectFirst(".StartPlayer_number__1SRt9")?.text() ?: "not uploaded")
                 }
             }
     }
@@ -47,9 +47,9 @@ internal fun NaverSportsBaseballMatchPage.extractStartingPitcherMostPitches(): J
             .take(3)
             .forEach { mostPitchElement ->
                 addJsonObject {
-                    put("구종", mostPitchElement.selectFirst(".StartPlayer_type__1LRwJ")!!.text())
-                    put("구속", mostPitchElement.selectFirst(".StartPlayer_speed__3UlYQ")!!.text())
-                    put("비율(퍼센트)", mostPitchElement.selectFirst(".StartPlayer_number__1SRt9")!!.text())
+                    put("구종", mostPitchElement.selectFirst(".StartPlayer_type__1LRwJ")?.text() ?: "not uploaded")
+                    put("구속", mostPitchElement.selectFirst(".StartPlayer_speed__3UlYQ")?.text() ?: "not uploaded")
+                    put("비율(퍼센트)", mostPitchElement.selectFirst(".StartPlayer_number__1SRt9")?.text() ?: "not uploaded")
                 }
             }
     }

@@ -70,7 +70,7 @@ object BaseballScrapePipeline {
             var startingPitcherMostPitches: JsonObject? = null
 
             if (matchInfo.league == League.Baseball.KBO) {
-                val naverSportsMatchInfo = NaverSportsBaseballScraper.scrapeMatchPage(browserPool, matchInfo.naverSportsDetailPageUrl, matchInfo.matchAt.toLocalDate())
+                val naverSportsMatchInfo = NaverSportsBaseballScraper.scrapeMatchPage(browserPool, matchInfo.naverSportsDetailPageUrl)
                 startingPitcherStatistics = naverSportsMatchInfo.extractStaringPitcherStatistics()
                 startingPitcherMostPitches = naverSportsMatchInfo.extractStartingPitcherMostPitches()
             }

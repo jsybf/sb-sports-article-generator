@@ -23,10 +23,11 @@ internal object NaverSportsBaseballScraper {
             .let { NaverSportsBaseballMatchListPage(it, league) }
     }
 
-    suspend fun scrapeMatchPage(browserPool: PlaywrightBrowserPool, matchUrl: String, date: LocalDate): NaverSportsBaseballMatchPage {
+    suspend fun scrapeMatchPage(browserPool: PlaywrightBrowserPool, matchUrl: String): NaverSportsBaseballMatchPage {
         assert(matchUrl.startsWith("https://m.sports.naver.com/game"))
         return browserPool
             .doAndGetDocAsync {
+                logger.debug("requesting naver sports starting pitchers (url={})", matchUrl)
                 navigate(matchUrl)
             }
             .await()
