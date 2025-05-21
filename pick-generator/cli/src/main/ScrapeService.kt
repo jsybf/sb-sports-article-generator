@@ -31,13 +31,13 @@ private fun readResourceFile(path: String): String = object {}::class.java.getRe
 private object PromptContainer {
     private val hockeyPrompt = readResourceFile("/hockey-prompt.txt")
     private val basketballPrompt = readResourceFile("/basketball-prompt.txt")
-    private val baseballPrompt = readResourceFile("/basketball-prompt.txt")
+    private val baseballPrompt = readResourceFile("/baseball-prompt.txt")
     private val minorSoccerPrompt = readResourceFile("/minor-soccer-prompt.txt")
 
     fun findByLeague(league: League): String = when (league) {
         is League.Hockey -> hockeyPrompt
-        is League.Baseball -> basketballPrompt
-        is League.Basketball -> baseballPrompt
+        is League.Baseball -> baseballPrompt
+        is League.Basketball -> basketballPrompt
         is League.MinorSoccer -> minorSoccerPrompt
     }
 }
