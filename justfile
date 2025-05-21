@@ -63,8 +63,8 @@ push-pick-generator: build-pick-generator
     aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${PICK_GENERATOR_ECR_URI}
     docker tag sb-pick/pick-generator:{{ pick_generator_version }} ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:{{ pick_generator_version }}
     docker tag sb-pick/pick-generator:{{ pick_generator_version }} ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
-    docker push  ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:{{ pick_generator_version }}
-    docker push  ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
+    docker push ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:{{ pick_generator_version }}
+    docker push ${PICK_GENERATOR_ECR_URI}/sb-pick/pick-generator:latest
 
 build-pick-generator:
     docker buildx build \
@@ -72,6 +72,7 @@ build-pick-generator:
         -t sb-pick/pick-generator:{{ pick_generator_version }} \
         -f ./docker/pick-generator/Dockerfile \
         --build-arg app_version={{ pick_generator_version }} \
+        --load \
         .
 
 build-download-server:
@@ -80,6 +81,7 @@ build-download-server:
         -t gitp/download-server:{{ pick_generator_version }} \
         -f ./docker/download-server/Dockerfile \
         --build-arg app_version={{ download_server_version }} \
+        --load \
         .
 
 push-download-server: build-download-server
