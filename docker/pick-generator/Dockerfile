@@ -6,6 +6,7 @@ COPY pick-generator/scraper/baseball-scraper/pom.xml pick-generator/scraper/base
 COPY pick-generator/scraper/basketball-scraper/pom.xml pick-generator/scraper/basketball-scraper/pom.xml
 COPY pick-generator/scraper/hockey-scraper/pom.xml pick-generator/scraper/hockey-scraper/pom.xml
 COPY pick-generator/scraper/soccer-minor-scraper/pom.xml pick-generator/scraper/soccer-minor-scraper/pom.xml
+COPY pick-generator/scraper/k1-scraper/pom.xml pick-generator/scraper/k1-scraper/pom.xml
 COPY pick-generator/database/pom.xml pick-generator/database/pom.xml
 COPY pick-generator/cli/pom.xml pick-generator/cli/pom.xml
 COPY pick-generator/claude/pom.xml pick-generator/claude/pom.xml

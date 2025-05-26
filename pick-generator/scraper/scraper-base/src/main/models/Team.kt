@@ -105,3 +105,24 @@ sealed interface BaseballTeam {
 
 
 }
+
+enum class K1Team(val teamName: String) {
+    JEONBUK("전북"),
+    DAEJEON("대전"),
+    GIMCHEON("김천"),
+    POHANG("포항"),
+    ANYANG("안양"),
+    JEJU("제주"),
+    SUWON_FC("수원FC"),
+    SEOUL("서울"),
+    DAEGU("대구"),
+    ULSAN("울산"),
+    GANGWON("강원"),
+    GWANGJU("광주");
+
+    companion object {
+        fun fromTeamName(teamName: String): K1Team {
+            return values().find { it.teamName == teamName } ?: throw IllegalArgumentException("can't find K1Team enum entry by '${teamName}'")
+        }
+    }
+}

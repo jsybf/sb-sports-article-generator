@@ -36,6 +36,10 @@ sealed interface League {
 
     }
 
+    enum class KoreaSoccer(override val leagueName: String, val fixtureListPageUrl: String, override val sportsName: String = "korea-soccer") : League {
+        K1("K1", "https://www.flashscore.co.kr/soccer/south-korea/k-league-1/fixtures/")
+    }
+
     enum class MinorSoccer(override val leagueName: String, val fixtureListPageUrl: String, override val sportsName: String = "minor-soccer") : League {
         K2("K2", "https://www.flashscore.co.kr/soccer/south-korea/k-league-2/fixtures/"),
         K3("K3", "https://www.flashscore.co.kr/soccer/south-korea/k3-league/fixtures/"),

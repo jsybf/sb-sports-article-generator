@@ -5,7 +5,7 @@ import io.gitp.sbpick.pickgenerator.scraper.soccerminorscraper.logger
 import kotlinx.serialization.json.*
 import org.jsoup.nodes.Document
 
-data class FlashscoreMatchPage(
+internal data class FlashscoreMatchPage(
     val doc: Document
 )
 

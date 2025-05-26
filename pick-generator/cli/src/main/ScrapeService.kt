@@ -12,6 +12,7 @@ import io.gitp.sbpick.pickgenerator.database.repositories.SportsMatchRepository
 import io.gitp.sbpick.pickgenerator.scraper.baseballscraper.BaseballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.basketballscraper.FlashscoreBasketballScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.hockeyscraper.FlashscoreHockeyScrapePipeline
+import io.gitp.sbpick.pickgenerator.scraper.k1scraper.FlashscoreK1ScrapePipeline
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.RequiredPageNotFound
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.browser.PlaywrightBrowserPool
 import io.gitp.sbpick.pickgenerator.scraper.scrapebase.models.LLMAttachment
@@ -33,12 +34,14 @@ private object PromptContainer {
     private val basketballPrompt = readResourceFile("/basketball-prompt.txt")
     private val baseballPrompt = readResourceFile("/baseball-prompt.txt")
     private val minorSoccerPrompt = readResourceFile("/minor-soccer-prompt.txt")
+    private val k1Prompt = readResourceFile("/k1-prompt.txt")
 
     fun findByLeague(league: League): String = when (league) {
         is League.Hockey -> hockeyPrompt
         is League.Baseball -> baseballPrompt
         is League.Basketball -> basketballPrompt
         is League.MinorSoccer -> minorSoccerPrompt
+        is League.KoreaSoccer -> k1Prompt
     }
 }
 
@@ -83,6 +86,15 @@ internal object MinorSoccerScrapeService : ScrapeService<League.MinorSoccer> {
     }
 }
 
+internal object K1ScrapeService : ScrapeService<League.KoreaSoccer> {
+    override suspend fun scrape(browserPool: PlaywrightBrowserPool, league: League.KoreaSoccer, matchAt: LocalDate): Flow<Result<Pair<MatchInfo, LLMAttachment>>> {
+        return FlashscoreK1ScrapePipeline
+            .scrapeFixtures(browserPool, league, matchAt)
+            .asFlow()
+            .map { matchInfo -> FlashscoreK1ScrapePipeline.scrapeMatch(browserPool, matchInfo).mapCatching { Pair(matchInfo, it) } }
+    }
+}
+
 
 suspend fun PlaywrightBrowserPool.scrape(
     league: League,
@@ -94,6 +106,7 @@ suspend fun PlaywrightBrowserPool.scrape(
         is League.Baseball -> BaseballScrapeService.scrape(this, league, matchAt)
         is League.Hockey -> HockeyScrapeService.scrape(this, league, matchAt)
         is League.MinorSoccer -> MinorSoccerScrapeService.scrape(this, league, matchAt)
+        is League.KoreaSoccer -> K1ScrapeService.scrape(this, league, matchAt)
     }
         .filterNot { scrapeResult: Result<Pair<MatchInfo, LLMAttachment>> ->
             scrapeResult
