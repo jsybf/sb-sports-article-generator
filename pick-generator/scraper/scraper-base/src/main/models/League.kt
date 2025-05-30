@@ -21,7 +21,7 @@ sealed interface League {
         CBA("CBA", "https://www.flashscore.co.kr/basketball/china/cba/fixtures/"),
         WNBA("WNBA", "https://www.flashscore.co.kr/basketball/usa/wnba/fixtures/"),
         ACB("ACB", "https://www.flashscore.co.kr/basketball/spain/acb/fixtures/"),
-        NBL("NBL", "https://www.flashscore.co.kr/basketball/bulgaria/nbl/fixtures/")
+        NBL("NBL", "https://www.flashscore.co.kr/basketball/new-zealand/nbl/fixtures/")
     }
 
     enum class Hockey(override val leagueName: String, val matchListPageUrl: String, override val sportsName: String = "hockey") : League {

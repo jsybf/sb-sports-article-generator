@@ -108,6 +108,17 @@ class ScrapeThenGenerateCommand : CliktCommand("scrape-gene") {
                 pickRepo = pickRepo,
             )
         }
+        // runBlocking {
+        //     scrapeGeneratePersistPick(
+        //         leagues = leagues,
+        //         excludeMatches = existingMatches,
+        //         browserPool = browserPool,
+        //         claudeClient = claudeClient,
+        //         sportsMatchRepo = sportsMatchRepo,
+        //         matchAt = LocalDate.now().plusDays(2),
+        //         pickRepo = pickRepo,
+        //     )
+        // }
     }
 
     private fun parseLeagueArgument(leagueArg: String): Set<League> {

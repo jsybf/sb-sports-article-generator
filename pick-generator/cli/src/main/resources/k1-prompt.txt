@@ -12,7 +12,9 @@
 - OVER_UNDER_PREDICTION: 해외배당기반으로 측정한 2.5 총점에 대한 over/under 확률 
 - WIN_DRAW_LOOSE_PREDICTION: 해외배당기반으로 측정한 홈기준 승,무,패 확률(백분위)
 - H2H_RECORD: home-to-home 기록
-- MAJOR_PLAYERS_DESC: 홈팀, 원정팀 각각의 에이스 선수 랜덤을 한명씩에 대한 정보들
+- MAJOR_PLAYERS_DESC: 홈팀, 원정팀 각각의 에이스 선수 랜덤을 한명씩에 대한 정보들(원정팀의 선수들을 홈팀에 적는 것 같은 실수는 절대 하지 말아줘)
+	- home_major_player 필드: 홈팀의 주요 선수들
+	- away_major_player 필드: 원정팀의 주요선수들
 
 모든 데이터는 xml필드에 json 형식으로 주어질꺼야
 
@@ -44,6 +46,9 @@ MAJOR_PLAYERS_DESC를 활용할때는 자연스럽 페러프라이징을 해줘�
 핸디캡(-1) :
 언/오버(2.5) :
 """
+
+# 참고사항
+글의 포멧은 예시들을 참고해서 맞춰줘. 마크다운형식으로 작성하지 말아주고
 
 # 예시들
 <examples>
