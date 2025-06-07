@@ -40,6 +40,11 @@
             <version>${exposed.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-json</artifactId>
+            <version>${exposed.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>${dep.version.mysql-jdbc}</version>

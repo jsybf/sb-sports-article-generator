@@ -126,3 +126,35 @@ enum class K1Team(val teamName: String) {
         }
     }
 }
+
+enum class VnlWommenTeam(val flashscoreName: String, val sofascoreName: String) {
+    BELGIUM("벨기에 여", "Belgium"),
+    CHINA("중국 여", "China"),
+    BULGARIA("불가리아 여", "Bulgaria"),
+    GERMANY("독일 여", "Germany"),
+    CANADA("캐나다 여", "Canada"),
+    USA("미국 여", "USA"),
+    FRANCE("프랑스 여", "France"),
+    TURKEY("터키 여", "Türkiye"),
+    DOMINICAN_REPUBLIC("도미니카공화국 여", "Dominican Republic"),
+    SOUTH_KOREA("대한민국 여", "South Korea"),
+    SERBIA("세르비아 여", "Serbia"),
+    CZECH_REPUBLIC("체코 여", "Czechia"),
+    BRAZIL("브라질 여", "Brazil"),
+    THAILAND("태국 여", "Thailand"),
+    NETHERLANDS("네덜란드 여", "Netherlands"),
+    JAPAN("일본 여", "Japan"),
+    ITALY("이탈리아 여", "Italy"),
+    POLAND("폴란드 여", "Poland");
+
+    companion object {
+        @Throws(TeamNameNotFound::class)
+        fun fromFlashscore(name: String): VnlWommenTeam = VnlWommenTeam.entries.find { it.flashscoreName == name } ?: throw TeamNameNotFound("can't find team name(used in flashscore) with '${name}'")
+
+        @Throws(TeamNameNotFound::class)
+        fun fromSofascore(name: String): VnlWommenTeam = VnlWommenTeam.entries.find { it.sofascoreName == name } ?: throw TeamNameNotFound("can't find team name(used in sofascore) with '${name}'")
+    }
+}
+
+
+class TeamNameNotFound(msg: String) : Exception(msg)
